@@ -1,0 +1,75 @@
+***************
+*** 124,134 ****
+  
+      //Add filters, so that only certain file types can be selected:
+  
+      Gtk::FileFilter filter_pp;
+      filter_pp.set_name(M("PROFILEPANEL_FILEDLGFILTERPP"));
+-     filter_pp.add_pattern("*.pp2");
+      dialog.add_filter(filter_pp);
+  
+      Gtk::FileFilter filter_any;
+      filter_any.set_name(M("PROFILEPANEL_FILEDLGFILTERANY"));
+      filter_any.add_pattern("*");
+--- 124,134 ----
+  
+      //Add filters, so that only certain file types can be selected:
+  
+      Gtk::FileFilter filter_pp;
+      filter_pp.set_name(M("PROFILEPANEL_FILEDLGFILTERPP"));
++     filter_pp.add_pattern("*.pp3");
+      dialog.add_filter(filter_pp);
+  
+      Gtk::FileFilter filter_any;
+      filter_any.set_name(M("PROFILEPANEL_FILEDLGFILTERANY"));
+      filter_any.add_pattern("*");
+***************
+*** 154,164 ****
+          int dirpos2 = fname.find_last_of ('\\');
+          if (dirpos2!=Glib::ustring::npos && dirpos2>dotpos)
+              hasext = false;
+  
+          if (!hasext) 
+-             fname = fname + ".pp2";
+  
+          if (Glib::file_test (fname, Glib::FILE_TEST_EXISTS)) {
+            Glib::ustring msg_ = Glib::ustring("<b>") + fname + ": " + M("MAIN_MSG_ALREADYEXISTS") + "\n" + M("MAIN_MSG_QOVERWRITE") + "</b>";
+            Gtk::MessageDialog msgd (msg_, true, Gtk::MESSAGE_WARNING, Gtk::BUTTONS_YES_NO, true);
+            int response = msgd.run ();
+--- 154,164 ----
+          int dirpos2 = fname.find_last_of ('\\');
+          if (dirpos2!=Glib::ustring::npos && dirpos2>dotpos)
+              hasext = false;
+  
+          if (!hasext) 
++             fname = fname + ".pp3";
+  
+          if (Glib::file_test (fname, Glib::FILE_TEST_EXISTS)) {
+            Glib::ustring msg_ = Glib::ustring("<b>") + fname + ": " + M("MAIN_MSG_ALREADYEXISTS") + "\n" + M("MAIN_MSG_QOVERWRITE") + "</b>";
+            Gtk::MessageDialog msgd (msg_, true, Gtk::MESSAGE_WARNING, Gtk::BUTTONS_YES_NO, true);
+            int response = msgd.run ();
+***************
+*** 213,223 ****
+  
+      //Add filters, so that only certain file types can be selected:
+  
+      Gtk::FileFilter filter_pp;
+      filter_pp.set_name(M("PROFILEPANEL_FILEDLGFILTERPP"));
+-     filter_pp.add_pattern("*.pp2");
+      dialog.add_filter(filter_pp);
+  
+      Gtk::FileFilter filter_any;
+      filter_any.set_name(M("PROFILEPANEL_FILEDLGFILTERANY"));
+      filter_any.add_pattern("*");
+--- 213,223 ----
+  
+      //Add filters, so that only certain file types can be selected:
+  
+      Gtk::FileFilter filter_pp;
+      filter_pp.set_name(M("PROFILEPANEL_FILEDLGFILTERPP"));
++     filter_pp.add_pattern("*.pp3");
+      dialog.add_filter(filter_pp);
+  
+      Gtk::FileFilter filter_any;
+      filter_any.set_name(M("PROFILEPANEL_FILEDLGFILTERANY"));
+      filter_any.add_pattern("*");
