@@ -1148,7 +1148,7 @@ void ImProcFunctions::simpltransform_ (Image16* original, Image16* transformed, 
 
                 double vignmul = 1.0 / (v + mul * tanh (b*(maxRadius-s*r) / maxRadius));
 
-                if (ys >= 0 && ys <= miy2 && xs >= 0 && xs <= mix2) {   // all interpolation pixels inside image
+                if (ys >= 0 && ys <= miy2 && xs >= 0 && xs <= mix2 && yc < miy-1) {   // all interpolation pixels inside image
 
                     int r = vignmul*(original->r[yc][xc]*(1.0-Dx)*(1.0-Dy) + original->r[yc][xc+1]*Dx*(1.0-Dy) + original->r[yc+1][xc]*(1.0-Dx)*Dy + original->r[yc+1][xc+1]*Dx*Dy);
                     int g = vignmul*(original->g[yc][xc]*(1.0-Dx)*(1.0-Dy) + original->g[yc][xc+1]*Dx*(1.0-Dy) + original->g[yc+1][xc]*(1.0-Dx)*Dy + original->g[yc+1][xc+1]*Dx*Dy);
