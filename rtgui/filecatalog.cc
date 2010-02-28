@@ -255,11 +255,13 @@ void FileCatalog::dirSelected (const Glib::ustring& dirname, const Glib::ustring
         _refreshProgressBar ();
         previewLoader.process ();
 		
-#ifndef _WIN32
+#ifdef _WIN32
+      wdMonitor = new WinDirMonitor (selectedDirectory, this);
+#elif defined __APPLE__
+      printf("dir->monitor_directory () doesn't work for Mac OS X until now\n");
+#else  
         dirMonitor = dir->monitor_directory ();
         dirMonitor->signal_changed().connect (sigc::bind(sigc::mem_fun(*this, &FileCatalog::on_dir_changed), false));
-#else
-        wdMonitor = new WinDirMonitor (selectedDirectory, this);
 #endif
     }
     catch (Glib::Exception& ex) {

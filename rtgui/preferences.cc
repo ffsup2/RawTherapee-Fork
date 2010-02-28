@@ -419,28 +419,42 @@ Gtk::Widget* Preferences::getGeneralPanel () {
     hb7c->pack_start (*editorToSendTo);
     Gtk::RadioButton::Group ge = edOther->get_group();
   
-#ifndef _WIN32    
+#ifdef __APPLE__
+  Gtk::HBox* hb7 = new Gtk::HBox ();
+  edGimp = new Gtk::RadioButton ("GIMP");
+  hb7->pack_start (*edGimp, Gtk::PACK_SHRINK,4);
+  dgvb->pack_start (*hb7, Gtk::PACK_SHRINK, 4);
+  edGimp->set_group (ge);
+ 
+  Gtk::HBox* hb7b = new Gtk::HBox ();
+  edPS = new Gtk::RadioButton (M("PREFERENCES_PSPATH")+":");
+  hb7b->pack_start (*edPS, Gtk::PACK_SHRINK,4);
+  psDir = new Gtk::FileChooserButton (M("PREFERENCES_PSPATH"), Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
+  hb7b->pack_start (*psDir);
+  dgvb->pack_start (*hb7b, Gtk::PACK_SHRINK, 4);
+  edPS->set_group (ge);
+#elif defined _WIN32
+  Gtk::HBox* hb7 = new Gtk::HBox ();
+  edGimp = new Gtk::RadioButton (M("PREFERENCES_GIMPPATH")+":");
+  hb7->pack_start (*edGimp, Gtk::PACK_SHRINK,4);
+  gimpDir = new Gtk::FileChooserButton (M("PREFERENCES_GIMPPATH"), Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
+  hb7->pack_start (*gimpDir);
+  dgvb->pack_start (*hb7, Gtk::PACK_SHRINK, 4);
+  edGimp->set_group (ge);
+ 
+  Gtk::HBox* hb7b = new Gtk::HBox ();
+  edPS = new Gtk::RadioButton (M("PREFERENCES_PSPATH")+":");
+  hb7b->pack_start (*edPS, Gtk::PACK_SHRINK,4);
+  psDir = new Gtk::FileChooserButton (M("PREFERENCES_PSPATH"), Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
+  hb7b->pack_start (*psDir);
+  dgvb->pack_start (*hb7b, Gtk::PACK_SHRINK, 4);
+  edPS->set_group (ge);
+#else
     Gtk::HBox* hb7 = new Gtk::HBox ();
     edGimp = new Gtk::RadioButton ("GIMP");
     hb7->pack_start (*edGimp, Gtk::PACK_SHRINK,4);
     dgvb->pack_start (*hb7, Gtk::PACK_SHRINK, 4);
     edGimp->set_group (ge);
-#else
-    Gtk::HBox* hb7 = new Gtk::HBox ();
-    edGimp = new Gtk::RadioButton (M("PREFERENCES_GIMPPATH")+":");
-    hb7->pack_start (*edGimp, Gtk::PACK_SHRINK,4);
-    gimpDir = new Gtk::FileChooserButton (M("PREFERENCES_GIMPPATH"), Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
-    hb7->pack_start (*gimpDir);
-    dgvb->pack_start (*hb7, Gtk::PACK_SHRINK, 4);
-    edGimp->set_group (ge);
-
-    Gtk::HBox* hb7b = new Gtk::HBox ();
-    edPS = new Gtk::RadioButton (M("PREFERENCES_PSPATH")+":");
-    hb7b->pack_start (*edPS, Gtk::PACK_SHRINK,4);
-    psDir = new Gtk::FileChooserButton (M("PREFERENCES_PSPATH"), Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
-    hb7b->pack_start (*psDir);
-    dgvb->pack_start (*hb7b, Gtk::PACK_SHRINK, 4);
-    edPS->set_group (ge);
 #endif
 
     dgvb->pack_start (*hb7c, Gtk::PACK_SHRINK, 4);
@@ -645,6 +659,8 @@ void Preferences::storePreferences () {
 #ifdef _WIN32    
     moptions.gimpDir        = gimpDir->get_filename ();
     moptions.psDir          = psDir->get_filename ();
+#elif defined __APPLE__
+    moptions.psDir          = psDir->get_filename (); 
 #endif	
     moptions.customEditorProg = editorToSendTo->get_text ();
     if (edGimp->get_active ())
@@ -652,6 +668,9 @@ void Preferences::storePreferences () {
 #ifdef _WIN32    
     else if (edPS->get_active ())
         moptions.editorToSendTo = 2;
+#elif defined __APPLE__   
+    else if (edPS->get_active ())
+      moptions.editorToSendTo = 2; 
 #endif	
     else if (edOther->get_active ())
         moptions.editorToSendTo = 3;
@@ -739,6 +758,10 @@ void Preferences::fillPreferences () {
         gimpDir->set_filename (moptions.gimpDir);
     if (Glib::file_test (moptions.psDir, Glib::FILE_TEST_IS_DIR)) 
         psDir->set_filename (moptions.psDir);
+#elif defined __APPLE__
+  edPS->set_active (moptions.editorToSendTo==2);
+  if (Glib::file_test (moptions.psDir, Glib::FILE_TEST_IS_DIR))
+    psDir->set_filename (moptions.psDir); 
 #endif	
     editorToSendTo->set_text (moptions.customEditorProg);
 

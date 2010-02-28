@@ -688,6 +688,17 @@ void EditorPanel::sendToGimpPressed () {
                 				success = false;
                 			}
                 		}
+#elif defined __APPLE__
+                      cmdLine = Glib::ustring("gimp ") + " \"" + filename + "\"";
+                      printf ("command line: |%s|\n", Glib::filename_from_utf8(cmdLine).c_str());
+                      try {
+                        Glib::spawn_command_line_async (Glib::filename_from_utf8(cmdLine));
+                        success = true;
+                      }
+                      catch (const Glib::SpawnError&) {
+                        success = false;
+                      } 
+
                         #else
                         cmdLine = Glib::ustring("gimp ") + " \"" + filename + "\"";
                         printf ("command line: |%s|\n", Glib::filename_from_utf8(cmdLine).c_str());
@@ -702,13 +713,21 @@ void EditorPanel::sendToGimpPressed () {
                     }
                 }
                 else if (options.editorToSendTo==2) {
+	#ifdef __APPLE__
+		cmdLine = Glib::ustring("open -a \'") + Glib::build_filename(options.psDir,"Photoshop.app\' ")  + "\'" + filename + "\'"; 
+	#else
                     cmdLine = Glib::ustring("\"") + Glib::build_filename(options.psDir,"Photoshop.exe") + "\" \"" + filename + "\"";
+	#endif
                     printf ("command line: |%s|\n", Glib::filename_from_utf8(cmdLine).c_str());
                     Glib::spawn_command_line_async (Glib::filename_from_utf8(cmdLine));
                     success = true;
                 }
                 else if (options.editorToSendTo==3) {
+	#ifdef __APPLE__
+			cmdLine = Glib::ustring("") + options.customEditorProg + filename; 
+	#else
                     cmdLine = Glib::ustring("\"") + options.customEditorProg + "\" \"" + filename + "\"";
+	#endif
                     printf ("command line: |%s|\n", Glib::filename_from_utf8(cmdLine).c_str());
                     Glib::spawn_command_line_async (Glib::filename_from_utf8(cmdLine));
                     success = true;
