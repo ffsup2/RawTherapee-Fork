@@ -1,0 +1,45 @@
+#!/bin/bash
+# Function checkLink:
+# args: $1 - file
+#
+# Will loop through all dynamic links for $file, and update each to be relative.
+function checkLink {
+	#echo "checkLink called with $1 $2"
+	local FILE=$1
+
+	#otool -L $FILE
+
+	otool -L $FILE | grep -v 'RawTherapee.app' | grep -v '/opt/local' | grep -v '/usr/' | grep -v '/System/' | grep -v "@executable_path" | cut -f 1 -d ' ' | while read X
+	do 
+		local NAME=`basename "$X"`
+		if [ ! -f "RawTherapee.app/Contents/Frameworks/$NAME" ]
+		then
+			#echo "Copy $X to Frameworks"
+			cp $X "RawTherapee.app/Contents/Frameworks/$NAME"
+		
+			#Recursively update the linkage of libraries
+			checkLink "RawTherapee.app/Contents/Frameworks/$NAME"
+		fi
+
+		echo "$FILE: Changing link $X to @executable_path/../Frameworks/$NAME"
+		install_name_tool -change $X "@executable_path/../Frameworks/$NAME" $FILE
+	done
+}
+
+if [ ! -d release ]; then
+	echo "Please run this from the root of the project; i.e. './tools/osx/make-app-bundle'."
+	exit
+fi
+
+rm -rf "RawTherapee.app"
+mkdir -p "RawTherapee.app/Contents/Resources"
+mkdir -p "RawTherapee.app/Contents/MacOS"
+mkdir -p "RawTherapee.app/Contents/Frameworks"
+
+cp -R release/* RawTherapee.app/Contents/MacOS
+
+cp tools/osx/Info.plist RawTherapee.app/Contents
+cp tools/osx/RawTherapee.icns RawTherapee.app/Contents/Resources
+
+#Copy and relink the needed libraries
+checkLink "RawTherapee.app/Contents/MacOS/rt"
