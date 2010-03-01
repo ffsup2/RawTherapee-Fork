@@ -344,7 +344,12 @@ void FileCatalog::_previewsFinished () {
     progressBar->hide ();
 	if (filterPanel) {
 		filterPanel->set_sensitive (true);
-		filterPanel->setFilter (currentEFS);
+	    if ( !hasValidCurrentEFS ){
+	        currentEFS = dirEFS;
+		    filterPanel->setFilter ( dirEFS,true );
+	    }else {
+		    filterPanel->setFilter ( currentEFS,false );
+	    }
 	}
 }
 
