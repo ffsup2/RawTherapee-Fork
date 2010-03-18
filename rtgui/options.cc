@@ -122,6 +122,7 @@ void Options::setDefaults () {
 Options* Options::copyFrom (Options* other) {
 
     *this = *other;
+	return this;
 }
 
 int Options::readFromFile (Glib::ustring fname) {

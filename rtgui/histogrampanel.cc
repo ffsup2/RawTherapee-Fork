@@ -459,6 +459,7 @@ bool HistogramArea::on_button_press_event (GdkEventButton* event) {
         renderHistogram ();
         queue_draw ();
     }
+	return true;
 }
 
 

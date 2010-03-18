@@ -4,10 +4,15 @@ Makefile
 cmake_install.cmake
 RawTherapee.app
 install_manifest.txt
+.cproject
+.project
 *.dylib
 *.a
 *.rej
 release/options
-release/rt
+release/rt*
+release/librtengine.dll
+release/rwz_sdk_s.dll
 release/rtstart
-rtgui/rt
+rtengine/librtengine.dll
+rtgui/rt*
