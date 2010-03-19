@@ -19,13 +19,14 @@
 #ifndef _NIKONATTRIBS_
 #define _NIKONATTRIBS_
 
-#include <rtexif.h>
 #include <string>
 #include <map>
 #include <math.h>
 #include <sstream>
 #include <iomanip>
 #include <string.h>
+
+#include "rtexif.h"
 
 namespace rtexif {
 

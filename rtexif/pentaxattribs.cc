@@ -19,12 +19,13 @@
 #ifndef _PENTAXATTRIBS_
 #define _PENTAXATTRIBS_
 
-#include <rtexif.h>
 #include <string>
 #include <map>
 #include <math.h>
 #include <sstream>
 #include <iomanip>
+
+#include "rtexif.h"
 
 namespace rtexif {
 

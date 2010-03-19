@@ -18,12 +18,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with RawTherapee.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <rtexif.h>
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
 #include <time.h>
 #include <algorithm>
+
+#include "rtexif.h"
 
 namespace rtexif {
 

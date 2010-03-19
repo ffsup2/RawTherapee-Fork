@@ -19,12 +19,13 @@
 #ifndef _CANONATTRIBS_
 #define _CANONATTRIBS_
 
-#include <rtexif.h>
 #include <string>
 #include <map>
 #include <math.h>
 #include <sstream>
 #include <iomanip>
+
+#include "rtexif.h"
 
 namespace rtexif {
 

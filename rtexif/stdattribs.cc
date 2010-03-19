@@ -19,11 +19,12 @@
 #ifndef _STDATTRIBS_
 #define _STDATTRIBS_
 
-#include <rtexif.h>
 #include <string>
 #include <map>
 #include <math.h>
 #include <string.h>
+
+#include "rtexif.h"
 
 namespace rtexif {
 
