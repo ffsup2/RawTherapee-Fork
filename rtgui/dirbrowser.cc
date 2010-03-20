@@ -345,7 +345,7 @@ Gtk::TreePath DirBrowser::expandToDir (const Glib::ustring& absDirPath) {
         dir = strtok(NULL, "/\\");
     }
 
-    delete dcpy;
+    free(dcpy);
 
     path.up ();
     dirtree->expand_to_path (path);
