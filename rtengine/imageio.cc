@@ -151,7 +151,7 @@ int ImageIO::loadPNG  (Glib::ustring fname) {
 	//reading PNG header
 	unsigned char header[8];
 	fread (header, 1, 8, file);
-	if (!png_check_sig (header, 8)) {
+	if (!png_sig_cmp (header, 0, 8)) {
 		fclose(file);
 		return IMIO_HEADERERROR;
 	}
@@ -184,7 +184,7 @@ int ImageIO::loadPNG  (Glib::ustring fname) {
     embProfile = NULL;
 
 	//retrieving image information
-	unsigned long width,height;
+	png_uint_32 width,height;
 	int bit_depth,color_type,interlace_type,compression_type,filter_method;
 	png_get_IHDR(png,info,&width,&height,&bit_depth,&color_type,&interlace_type,
 		&compression_type, &filter_method);
