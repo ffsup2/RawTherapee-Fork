@@ -659,7 +659,7 @@ void CurveFactory::loadCurves (Glib::ustring fname) {
       curves[c->getName()] = c;
     }
   }
-  delete buffer;
+  delete [] buffer;
 
   setlocale (LC_ALL, "");
 }
