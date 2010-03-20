@@ -303,9 +303,8 @@ Gtk::TreePath DirBrowser::expandToDir (const Glib::ustring& absDirPath) {
 
     int end = 0;
     int beg = 0;
-    char* dir = new char [1024];
     char* dcpy = strdup (absDirPath.c_str());
-    dir = strtok (dcpy, "/\\");
+    char* dir = strtok (dcpy, "/\\");
     int count = 0;
     expandSuccess = true;
 
@@ -346,7 +345,6 @@ Gtk::TreePath DirBrowser::expandToDir (const Glib::ustring& absDirPath) {
         dir = strtok(NULL, "/\\");
     }
 
-    delete dir;
     delete dcpy;
 
     path.up ();
@@ -379,7 +377,8 @@ void DirBrowser::file_changed (const Glib::RefPtr<Gio::File>& file, const Glib::
     updateDir (iter);
     gdk_threads_leave();
 }
-void DirBrowser::selectDir (Glib::ustring dir) {
+
+void DirBrowser::selectDir (Glib::ustring dir) {
 
     open (dir, "");
 }
