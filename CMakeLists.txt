@@ -18,6 +18,7 @@ endif (WIN32)
 
 # check for libraries
 find_package(PkgConfig)
+pkg_check_modules (GTK     REQUIRED gtk+-2.0>=2.12)
 pkg_check_modules (GLIB2   REQUIRED glib-2.0>=2.16)
 pkg_check_modules (GLIBMM  REQUIRED glibmm-2.4>=2.16)
 pkg_check_modules (GTKMM   REQUIRED gtkmm-2.4>=2.12)
@@ -26,7 +27,6 @@ pkg_check_modules (GIOMM   REQUIRED giomm-2.4>=2.12)
 pkg_check_modules (GTHREAD REQUIRED gthread-2.0>=2.16)
 pkg_check_modules (GOBJECT REQUIRED gobject-2.0>=2.16)
 pkg_check_modules (SIGC    REQUIRED sigc++-2.0)
-find_package (GTK2 REQUIRED)
 # NOTE: dependencies should be handled by pkg_check_modules and FIND_PACKAGE
 # on windows too but I don't want to break current build chain
 if (WIN32)
