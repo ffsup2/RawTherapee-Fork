@@ -82,8 +82,8 @@ int main(int argc, char **argv)
     else
         argv1_ = "";
 
-   argv0 = Glib::filename_to_utf8 (argv0_);
-   argv1 = Glib::filename_to_utf8 (argv1_);
+   argv0 = Glib::locale_to_utf8 (argv0_);
+   argv1 = Glib::locale_to_utf8 (argv1_);
 
    Glib::thread_init();
    gdk_threads_init();
