@@ -6,19 +6,15 @@ option (BUILD_SHARED "Build rawtherapee with shared libraries" OFF)
 option (WITH_RAWZOR "Build with Rawzor support" ON)
 
 # set install directories
-if (WIN32)
+if (WIN32 OR APPLE)
     set (DATADIR ${CMAKE_CURRENT_SOURCE_DIR}/release)
     set (BINDIR  ${CMAKE_CURRENT_SOURCE_DIR}/release)
     set (LIBDIR ${CMAKE_CURRENT_SOURCE_DIR}/release)
-elseif (APPLE)
-    set (DATADIR ${CMAKE_CURRENT_SOURCE_DIR}/release)
-    set (BINDIR  ${CMAKE_CURRENT_SOURCE_DIR}/release)
-    set (LIBDIR ${CMAKE_CURRENT_SOURCE_DIR}/release)
-else (WIN32)
+else (WIN32 OR APPLE)
     set (DATADIR ${CMAKE_INSTALL_PREFIX}/share/rawtherapee)
     set (BINDIR  ${CMAKE_INSTALL_PREFIX}/bin)
     set (LIBDIR ${CMAKE_INSTALL_PREFIX}/lib)
-endif (WIN32)
+endif (WIN32 OR APPLE)
 
 # check for libraries
 find_package(PkgConfig)
