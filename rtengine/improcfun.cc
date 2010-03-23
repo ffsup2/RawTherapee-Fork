@@ -169,7 +169,7 @@ void ImProcFunctions::initCache () {
     for (int i=0; i<369620; i++)
         xcache[i] = CLIP(xcache[i]);
     zcache = new int[825747];
-    for (int i=-369619; i<456127; i++)
+    for (int i=-369619; i<456128; i++)
         zcache[i+369619] = (int)round(65536.0 * (i > 15728 ? ((double)i/76021)*((double)i/76021)*((double)i/76021)*0.82521 : (1.2841854934601665e-1*(double)i/76021-1.7712903358071262e-2)*0.82521));
     for (int i=0; i<825747; i++)
         zcache[i] = CLIP(zcache[i]);
