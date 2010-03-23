@@ -20,7 +20,7 @@ else (BUILD_SHARED)
     add_library (rtengine STATIC ${RTENGINESOURCEFILES})
 endif (BUILD_SHARED)
 
-set_target_properties (rtengine PROPERTIES COMPILE_FLAGS "-O3 -ffast-math -funroll-loops")
+set_target_properties (rtengine PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -funroll-loops")
 
 target_link_libraries (rtengine rtexif ${EXTRA_LIB} ${GOBJECT_LIBRARIES} ${GTHREAD_LIBRARIES}
     ${GLIB2_LIBRARIES} ${GLIBMM_LIBRARIES} ${LCMS_LIBRARIES} ${IPTCDATA_LIBRARIES}
