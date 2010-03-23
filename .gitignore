@@ -7,7 +7,6 @@ install_manifest.txt
 *.dylib
 *.a
 *.rej
-release/options
-release/rt
-release/rtstart
+release/
 rtgui/rt
+rtgui/config.h
