@@ -72,8 +72,8 @@ if (WITH_RAWZOR)
         install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/rawzor_win/rwz_sdk_s.dll DESTINATION ${BINDIR}
             PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ)
     elseif (APPLE)
-        set (EXTRA_INCDIR "../rawzor_mac")
-        set (EXTRA_LIBDIR "../rawzor_mac")
+        set (EXTRA_INCDIR "${CMAKE_CURRENT_SOURCE_DIR}/rawzor_mac")
+        set (EXTRA_LIBDIR "${CMAKE_CURRENT_SOURCE_DIR}/rawzor_mac")
         set (EXTRA_LIB "-lrwz_sdk_64")
         add_definitions (-DRAWZOR_SUPPORT)
         install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/rawzor_mac/librwz_sdk_64.dylib DESTINATION ${BINDIR}
