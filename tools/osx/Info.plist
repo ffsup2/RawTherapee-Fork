@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>rtstart</string>
+	<string>rt</string>
 	<key>CFBundleIconFile</key>
 	<string>RawTherapee.icns</string>
 	<key>CFBundleIdentifier</key>
