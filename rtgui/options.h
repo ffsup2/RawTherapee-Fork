@@ -127,6 +127,8 @@ class Options {
     int         saveToFile      (Glib::ustring fname);
     static void load            ();
     static void save            ();
+
+    bool        is_extention_enabled(Glib::ustring ext);
 };
 
 extern Options options;

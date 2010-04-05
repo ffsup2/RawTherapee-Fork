@@ -409,3 +409,10 @@ void Options::save () {
         options.saveToFile (rtdir + "/options");
     }
 }
+
+bool Options::is_extention_enabled (Glib::ustring ext) {
+		for (int j=0; j<parseExtensions.size(); j++)
+      if (parseExtensions[j].casefold() == ext.casefold())
+				return j>=parseExtensionsEnabled.size() || parseExtensionsEnabled[j];
+		return false;
+}
