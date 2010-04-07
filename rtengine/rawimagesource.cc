@@ -2456,7 +2456,7 @@ void RawImageSource::ppg_demosaic()
       d = dir[i = diff[0] > diff[1]];
       pix[0][1] = ULIM(guess[i] >> 2, pix[d][1], pix[-d][1]);
     }
-    plistener->setProgress(0.33*row/(height-3));
+    if(plistener) plistener->setProgress(0.33*row/(height-3));
   }
 /*  Calculate red and blue for each green pixel:		*/
   for (row=1; row < height-1; row++) {
@@ -2466,7 +2466,7 @@ void RawImageSource::ppg_demosaic()
 	pix[0][c] = CLIP((pix[-d][c] + pix[d][c] + 2*pix[0][1]
 			- pix[-d][1] - pix[d][1]) >> 1);
     }
-    plistener->setProgress(0.33 + 0.33*row/(height-1));
+    if(plistener) plistener->setProgress(0.33 + 0.33*row/(height-1));
   }
 /*  Calculate blue for red pixels and vice versa:		*/
   for (row=1; row < height-1; row++) {
@@ -2484,7 +2484,7 @@ void RawImageSource::ppg_demosaic()
       else
 	pix[0][c] = CLIP((guess[0]+guess[1]) >> 2);
     }
-    plistener->setProgress(0.67 + 0.33*row/(height-1));
+    if(plistener) plistener->setProgress(0.67 + 0.33*row/(height-1));
   }
 
   red = new unsigned short*[H];
@@ -2604,6 +2604,8 @@ void RawImageSource::ahd_demosaic()
 	  rgb[1][row-top][col-left][1] = ULIM(val,pix[-width][1],pix[width][1]);
 	}
       }
+
+    if(plistener) plistener->setProgress (0.33);
 /*  Interpolate red and blue, and convert to CIELab:		*/
       for (d=0; d < 2; d++)
 	for (row=top+1; row < top+TS-1 && row < height-3; row++)
@@ -2639,6 +2641,8 @@ void RawImageSource::ahd_demosaic()
 	    lix[0][1] = 64 * 500 * (xyz[0] - xyz[1]);
 	    lix[0][2] = 64 * 200 * (xyz[1] - xyz[2]);
 	  }
+
+      if(plistener) plistener->setProgress (0.5);
 /*  Build homogeneity maps from the CIELab images:		*/
       memset (homo, 0, 2*TS*TS);
       for (row=top+2; row < top+TS-2 && row < height-4; row++) {
@@ -2663,6 +2667,7 @@ void RawImageSource::ahd_demosaic()
 		homo[d][tr][tc]++;
 	}
       }
+      if(plistener) plistener->setProgress (0.8);
 /*  Combine the most homogenous pixels for the final result:	*/
       for (row=top+3; row < top+TS-3 && row < height-5; row++) {
 	tr = row-top;
@@ -2680,6 +2685,7 @@ void RawImageSource::ahd_demosaic()
 	}
       }
     }
+  if(plistener) plistener->setProgress (1.0);
   free (buffer);
   red = new unsigned short*[H];
   for (int i=0; i<H; i++) {
@@ -3018,106 +3024,101 @@ void RawImageSource::dcb_color_full(ushort (*image)[4])
 }
 
 
-
 // DCB demosaicing main routine (sharp version)
 void RawImageSource::dcb_demosaic(int iterations, int dcb_enhance)
 {
+        int i=1;
+        float (*image2)[3];
+        image2 = (float (*)[3]) calloc(W*H, sizeof *image2);
 
+        ushort (*image)[4];
 
-	int i=1;
-	float (*image2)[3];
-	image2 = (float (*)[3]) calloc(W*H, sizeof *image2);
+        if(plistener) {
+                plistener->setProgressStr ("Demosaicing...");
+                plistener->setProgress (0.0);
+        }
 
-  ushort (*image)[4];
+        image = (ushort (*)[4]) calloc (H*W, sizeof *image);
+        for (int ii=0; ii<H; ii++)
+                for (int jj=0; jj<W; jj++)
+                        image[ii*W+jj][fc(ii,jj)] = ri->data[ii][jj];
 
-  if (plistener) {
-    plistener->setProgressStr ("Demosaicing...");
-    plistener->setProgress (0.0);
-  }
+        border_interpolate(2, image);
+        copy_to_buffer(image2, image);
 
-  image = (ushort (*)[4]) calloc (H*W, sizeof *image);
-  for (int ii=0; ii<H; ii++)
-    for (int jj=0; jj<W; jj++)
-        image[ii*W+jj][fc(ii,jj)] = ri->data[ii][jj];
- 
- 		border_interpolate(2, image);
-		copy_to_buffer(image2, image);
+        hid(image);
+        dcb_color(image);
 
-hid(image);
-dcb_color(image);
-
-		while (i<=iterations)
-		{
-			//if (verbose) fprintf (stderr,_("DCB correction pass %d...\n"), i);
-			hid2(image);
-			hid2(image);
-			hid2(image);
-			dcb_map(image);
-			dcb_correction(image);	
-			i++;
-		}
-		plistener->setProgress (0.33);
-		
-		dcb_color(image);
-		dcb_pp(image);	
+        while (i<=iterations) {
+		//if (verbose) fprintf (stderr,_("DCB correction pass %d...\n"), i);
 		hid2(image);
-		hid2(image);  
 		hid2(image);
-
-	//if (verbose) fprintf (stderr,_("finishing DCB...\n"));
-		plistener->setProgress (0.5);
-		
-		dcb_map(image);
-		dcb_correction2(image);
-			
-		restore_from_buffer(image, image2); 
-			
+		hid2(image);
 		dcb_map(image);
 		dcb_correction(image);
+		i++;
+		if(plistener) plistener->setProgress (0.33*i/iterations);
+        }
+        if(plistener) plistener->setProgress (0.33);
 
-		dcb_color(image);
-		dcb_pp(image);
-		dcb_map(image);
-		dcb_correction(image);
+        dcb_color(image);
+        dcb_pp(image);	
+        hid2(image);
+        hid2(image);  
+        hid2(image);
 
-		dcb_map(image);
-		dcb_correction(image);
+        //if (verbose) fprintf (stderr,_("finishing DCB...\n"));
+        if(plistener) plistener->setProgress (0.5);
 
-		restore_from_buffer(image, image2);
-		dcb_color(image);
-						
-		plistener->setProgress (0.7);
-	if (dcb_enhance)
-	{
+        dcb_map(image);
+        dcb_correction2(image);
+
+        restore_from_buffer(image, image2); 
+
+        dcb_map(image);
+        dcb_correction(image);
+
+        dcb_color(image);
+        dcb_pp(image);
+        dcb_map(image);
+        dcb_correction(image);
+
+        dcb_map(image);
+        dcb_correction(image);
+
+        restore_from_buffer(image, image2);
+        dcb_color(image);
+
+        if(plistener) plistener->setProgress (0.7);
+        if (dcb_enhance) {
 		//if (verbose) fprintf (stderr,_("optional DCB refinement...\n"));			
 		dcb_refinement(image);
 		dcb_color_full(image);
-	}
+        }
 
-		plistener->setProgress (1.0);
+        if(plistener) plistener->setProgress (1.0);
 
-		free(image2);
+        free(image2);
 
-  red = new unsigned short*[H];
-  for (int i=0; i<H; i++) {
-    red[i] = new unsigned short[W];
-    for (int j=0; j<W; j++)
-        red[i][j] = image[i*W+j][0];
-  }
-  green = new unsigned short*[H];
-  for (int i=0; i<H; i++) {
-    green[i] = new unsigned short[W];
-    for (int j=0; j<W; j++)
-        green[i][j] = image[i*W+j][1];
-  }
-  blue = new unsigned short*[H];
-  for (int i=0; i<H; i++) {
-    blue[i] = new unsigned short[W];
-    for (int j=0; j<W; j++)
-        blue[i][j] = image[i*W+j][2];
-  }
-  free(image);
-
+        red = new unsigned short*[H];
+        for (int i=0; i<H; i++) {
+	        red[i] = new unsigned short[W];
+		for (int j=0; j<W; j++)
+			red[i][j] = image[i*W+j][0];
+        }
+        green = new unsigned short*[H];
+        for (int i=0; i<H; i++) {
+	        green[i] = new unsigned short[W];
+	        for (int j=0; j<W; j++)
+		        green[i][j] = image[i*W+j][1];
+        }
+        blue = new unsigned short*[H];
+        for (int i=0; i<H; i++) {
+	        blue[i] = new unsigned short[W];
+	        for (int j=0; j<W; j++)
+		        blue[i][j] = image[i*W+j][2];
+        }
+        free(image);
 }
 
 
