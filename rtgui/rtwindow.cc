@@ -66,7 +66,7 @@ RTWindow::RTWindow () {
 
     Gtk::VBox* mainBox = Gtk::manage (new Gtk::VBox ());
     mainBox->pack_start (*mainNB);   
-    Gtk::HBox* bottomBox = Gtk::manage (new Gtk::HBox ());
+    /*Gtk::HBox* bottomBox = Gtk::manage (new Gtk::HBox ());
     mainBox->pack_start (*bottomBox, Gtk::PACK_SHRINK, 1);
     Gtk::LinkButton* rtWeb = Gtk::manage (new Gtk::LinkButton ("http://rawtherapee.com"));
     bottomBox->pack_start (*rtWeb, Gtk::PACK_SHRINK, 1);
@@ -87,7 +87,7 @@ RTWindow::RTWindow () {
     rtWeb->modify_style (style);
     preferences->modify_style (style);
     exit->modify_style (style);
-
+*/
     add (*mainBox);
     show_all ();
 }

@@ -32,6 +32,8 @@ FilePanel::FilePanel () : parent(NULL) {
 
     dirpaned = new Gtk::HPaned ();
     dirpaned->set_position (options.dirBrowserWidth);
+	leftNotebook = new Gtk::Notebook ();
+	leftNotebook->set_tab_pos (Gtk::POS_TOP);
 
     dirBrowser = new DirBrowser ();
     placesBrowser = new PlacesBrowser ();
@@ -47,7 +49,10 @@ FilePanel::FilePanel () : parent(NULL) {
     placespaned->pack1 (*placesBrowser, false, true);
     placespaned->pack2 (*obox, true, true);
 
-    dirpaned->pack1 (*placespaned, Gtk::SHRINK);
+    Gtk::Label* dirLab = new Gtk::Label ("Files");
+    leftNotebook->append_page (*placespaned, *dirLab);
+
+    dirpaned->pack1 (*leftNotebook, Gtk::SHRINK);
 
     tpc = new BatchToolPanelCoordinator (this);
     fileCatalog = new FileCatalog (tpc->coarse, tpc->getToolBar());
@@ -59,50 +64,42 @@ FilePanel::FilePanel () : parent(NULL) {
     dirBrowser->addDirSelectionListener (recentBrowser);
     dirBrowser->addDirSelectionListener (placesBrowser);
     fileCatalog->setFileSelectionListener (this);
-    
-    rightBox = new Gtk::HBox ();
-    rightNotebook = new Gtk::Notebook ();
-    Gtk::VBox* taggingBox = new Gtk::VBox ();
-    
-    history = new History (false);
-
-    tpc->addPParamsChangeListener (history);
-    history->setProfileChangeListener (tpc);
 
     Gtk::ScrolledWindow* sFilterPanel = new Gtk::ScrolledWindow();
 	filterPanel = new FilterPanel ();
 	sFilterPanel->add (*filterPanel);
 	sFilterPanel->set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
+    Gtk::Label* filtLab = new Gtk::Label ("Filter");
+    leftNotebook->append_page (*sFilterPanel, *filtLab);
 
 	fileCatalog->setFilterPanel (filterPanel);
     fileCatalog->setImageAreaToolListener (tpc);
+
+    Gtk::ScrolledWindow *sOptionsPanel = new Gtk::ScrolledWindow();
+    preferencesPanel = new GlobalPreferencesPanel();
+    sOptionsPanel->add(*preferencesPanel);
+    sOptionsPanel->set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
+    Gtk::Label* optLab = new Gtk::Label ("Options");
+    leftNotebook->append_page (*sOptionsPanel, *optLab);
     
     //------------------
+    rightBox = new Gtk::HBox ();
 
-    rightNotebook->set_tab_pos (Gtk::POS_LEFT);
-    
-    Gtk::Label* devLab = new Gtk::Label ("Develop");
-    devLab->set_angle (90);
-    Gtk::Label* filtLab = new Gtk::Label ("Filter");
-    filtLab->set_angle (90);
-    Gtk::Label* tagLab = new Gtk::Label ("Tagging");
-    tagLab->set_angle (90);
+    history = new History (false);
+    tpc->addPParamsChangeListener (history);
+    history->setProfileChangeListener (tpc);
 
     Gtk::VPaned* tpcPaned = new Gtk::VPaned ();
     tpcPaned->pack1 (*tpc->toolPanelNotebook, true, true);
     tpcPaned->pack2 (*history, true, true);
+    tpcPaned->set_position(options.browserToolPanelWidth);
     
-    rightNotebook->append_page (*tpcPaned, *devLab);
-    rightNotebook->append_page (*sFilterPanel, *filtLab);
-    rightNotebook->append_page (*taggingBox, *tagLab);
-
-    rightBox->pack_start (*rightNotebook);
+    rightBox->pack_start (*tpcPaned);
 
     pack1(*dirpaned, true, true);
     pack2(*rightBox, false, true);
 
     fileCatalog->setFileSelectionChangeListener (tpc);
-
     fileCatalog->setFileSelectionListener (this);
     g_idle_add (fbinit, this);
 

@@ -106,13 +106,12 @@ void Options::setDefaults () {
     thumbnailZoomRatios.push_back (0.8);
     thumbnailZoomRatios.push_back (1.0);
     overlayedFileNames = true;
+    showFileNames = true;
 
     int babehav[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0};
     baBehav = std::vector<int> (babehav, babehav+22);
     
     rtSettings.dualThreadEnabled = true;
-    rtSettings.demosaicMethod = "eahd";
-    rtSettings.colorCorrectionSteps = 2;
     rtSettings.iccDirectory = "/usr/share/color/icc";
     rtSettings.colorimetricIntent = 1;
     rtSettings.monitorProfile = "";
@@ -208,6 +207,7 @@ if (keyFile.has_group ("File Browser")) {
     if (keyFile.has_key ("File Browser", "RenameUseTemplates")) renameUseTemplates = keyFile.get_boolean ("File Browser", "RenameUseTemplates");
     if (keyFile.has_key ("File Browser", "ThumbnailZoomRatios"))thumbnailZoomRatios= keyFile.get_double_list ("File Browser", "ThumbnailZoomRatios");
     if (keyFile.has_key ("File Browser", "OverlayedFileNames")) overlayedFileNames = keyFile.get_boolean ("File Browser", "OverlayedFileNames");
+    if (keyFile.has_key ("File Browser", "ShowFileNames"))      showFileNames = keyFile.get_boolean ("File Browser", "ShowFileNames");
 }
 
 if (keyFile.has_group ("Clipping Indication")) { 
@@ -233,11 +233,6 @@ if (keyFile.has_group ("GUI")) {
     if (keyFile.has_key ("GUI", "ProcessingQueueEnbled"))procQueueEnabled = keyFile.get_boolean ("GUI", "ProcessingQueueEnbled");
     if (keyFile.has_key ("GUI", "ToolPanelsExpanded"))  tpOpen            = keyFile.get_integer_list ("GUI", "ToolPanelsExpanded");
     if (keyFile.has_key ("GUI", "CurvePanelsExpanded")) crvOpen           = keyFile.get_integer_list ("GUI", "CurvePanelsExpanded");
-}
-
-if (keyFile.has_group ("Algorithms")) { 
-    if (keyFile.has_key ("Algorithms", "DemosaicMethod"))  rtSettings.demosaicMethod       = keyFile.get_string  ("Algorithms", "DemosaicMethod");
-    if (keyFile.has_key ("Algorithms", "ColorCorrection")) rtSettings.colorCorrectionSteps = keyFile.get_integer ("Algorithms", "ColorCorrection");
 }
 
 if (keyFile.has_group ("Crop Settings")) { 
@@ -313,6 +308,7 @@ int Options::saveToFile (Glib::ustring fname) {
     Glib::ArrayHandle<double> ptzoom = thumbnailZoomRatios;
     keyFile.set_double_list ("File Browser", "ThumbnailZoomRatios", ptzoom);
     keyFile.set_boolean ("File Browser", "OverlayedFileNames", overlayedFileNames);
+    keyFile.set_boolean ("File Browser", "ShowFileNames", showFileNames );
     
     keyFile.set_integer ("Clipping Indication", "HighlightThreshold", highlightThreshold);
     keyFile.set_integer ("Clipping Indication", "ShadowThreshold", shadowThreshold);
@@ -355,9 +351,6 @@ int Options::saveToFile (Glib::ustring fname) {
     Glib::ArrayHandle<int> crvopen = crvOpen;
     keyFile.set_integer_list ("GUI", "CurvePanelsExpanded", crvopen);
 
-    keyFile.set_string  ("Algorithms", "DemosaicMethod", rtSettings.demosaicMethod);
-    keyFile.set_integer ("Algorithms", "ColorCorrection", rtSettings.colorCorrectionSteps);
-    
     keyFile.set_integer ("Crop Settings", "DPI", cropDPI);
 
     keyFile.set_string  ("Color Management", "ICCDirectory",   rtSettings.iccDirectory);

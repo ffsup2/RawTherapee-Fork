@@ -47,6 +47,7 @@ ToolPanelCoordinator::ToolPanelCoordinator () : ipc(NULL)  {
     hlrecovery          = Gtk::manage (new HLRecovery ());
     chmixer             = Gtk::manage (new ChMixer ());
     resize              = Gtk::manage (new Resize ());
+    demosaic            = Gtk::manage (new RawDemosaicing());
     crop                = Gtk::manage (new Crop ());
     icm                 = Gtk::manage (new ICMPanel ());
     exifpanel           = Gtk::manage (new ExifPanel ());
@@ -69,6 +70,7 @@ ToolPanelCoordinator::ToolPanelCoordinator () : ipc(NULL)  {
     addPanel (transformPanel, cacorrection,     M("TP_CACORRECTION_LABEL"));   toolPanels.push_back (cacorrection);
     addPanel (transformPanel, vignetting,       M("TP_VIGNETTING_LABEL"));     toolPanels.push_back (vignetting);
     addPanel (transformPanel, resize,           M("TP_RESIZE_LABEL"));         toolPanels.push_back (resize);
+    addPanel (transformPanel, demosaic,         M("PREFERENCES_DEMOSAICINGALGO"));  toolPanels.push_back (demosaic);
     addPanel (colorPanel, icm,                  M("TP_ICM_LABEL"));            toolPanels.push_back (icm);
 
     toolPanels.push_back (coarse);

@@ -95,6 +95,8 @@ void ParamsEdited::set (bool v) {
         distortion.amount = v;
         cacorrection.red = v;
         cacorrection.blue = v;
+        rawdemosaic.ccSteps = v;
+        rawdemosaic.dmethod = v;
         vignetting.amount = v;
         vignetting.radius = v;
         chmixer.red[0] = v;
@@ -202,6 +204,8 @@ void ParamsEdited::initFrom (const std::vector<rtengine::procparams::ProcParams>
         distortion.amount = distortion.amount && p.distortion.amount == other.distortion.amount;
         cacorrection.red = cacorrection.red && p.cacorrection.red == other.cacorrection.red;
         cacorrection.blue = cacorrection.blue && p.cacorrection.blue == other.cacorrection.blue;
+        rawdemosaic.ccSteps = rawdemosaic.ccSteps && p.rawdemosaic.ccSteps == other.rawdemosaic.ccSteps;
+        rawdemosaic.dmethod = rawdemosaic.dmethod && p.rawdemosaic.dmethod == other.rawdemosaic.dmethod;
         vignetting.amount = vignetting.amount && p.vignetting.amount == other.vignetting.amount;
         vignetting.radius = vignetting.radius && p.vignetting.radius == other.vignetting.radius;
         chmixer.red[0] = chmixer.red[0] && p.chmixer.red[0] == other.chmixer.red[0];
@@ -300,6 +304,8 @@ void ParamsEdited::combine (rtengine::procparams::ProcParams& toEdit, const rten
 	if (distortion.amount)	toEdit.distortion.amount 	= options.baBehav[18] ? toEdit.distortion.amount + mods.distortion.amount : mods.distortion.amount;
 	if (cacorrection.red)	toEdit.cacorrection.red 	= options.baBehav[19] ? toEdit.cacorrection.red + mods.cacorrection.red : mods.cacorrection.red;
 	if (cacorrection.blue)	toEdit.cacorrection.blue 	= options.baBehav[20] ? toEdit.cacorrection.blue + mods.cacorrection.blue : mods.cacorrection.blue;
+	if (rawdemosaic.dmethod ) toEdit.rawdemosaic.dmethod = mods.rawdemosaic.dmethod;
+	if (rawdemosaic.ccSteps ) toEdit.rawdemosaic.ccSteps = mods.rawdemosaic.ccSteps;
 	if (vignetting.amount)	toEdit.vignetting.amount 	= options.baBehav[21] ? toEdit.vignetting.amount + mods.vignetting.amount : mods.vignetting.amount;
 	if (vignetting.radius)	toEdit.vignetting.radius 	= mods.vignetting.radius;
 	if (chmixer.red[0])		toEdit.chmixer.red[0] 	= mods.chmixer.red[0];

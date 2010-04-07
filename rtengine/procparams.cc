@@ -126,6 +126,9 @@ void ProcParams::setDefaults () {
     cacorrection.red  = 0;
     cacorrection.blue = 0;
     
+    rawdemosaic.ccSteps = 1;
+    rawdemosaic.dmethod = "eahd";
+
     hlrecovery.enabled = false;
     hlrecovery.method  = "Luminance";
 
@@ -274,6 +277,10 @@ int ProcParams::save (Glib::ustring fname) const {
     // save C/A correction
     keyFile.set_double  ("CACorrection", "Red",  cacorrection.red);
     keyFile.set_double  ("CACorrection", "Blue", cacorrection.blue);
+
+    // save RAW demosaicing
+    keyFile.set_integer ("RAWdemosaicing", "CcSteps", rawdemosaic.ccSteps);
+    keyFile.set_string  ("RAWdemosaicing", "Method", rawdemosaic.dmethod );
 
     // save vignetting correction
     keyFile.set_integer ("Vignetting Correction", "Amount", vignetting.amount);
@@ -486,6 +493,12 @@ if (keyFile.has_group ("CACorrection")) {
     if (keyFile.has_key ("CACorrection", "Blue")) cacorrection.blue = keyFile.get_double ("CACorrection", "Blue");
 }
 
+    // load RAW demosaicing
+if (keyFile.has_group ("RAWdemosaicing")) {
+    if (keyFile.has_key ("RAWdemosaicing", "CcSteps")) rawdemosaic.ccSteps  = keyFile.get_integer ("RAWdemosaicing", "CcSteps");
+    if (keyFile.has_key ("RAWdemosaicing", "Method"))  rawdemosaic.dmethod = keyFile.get_string ("RAWdemosaicing", "Method");
+}
+
     // load vignetting correction
 if (keyFile.has_group ("Vignetting Correction")) {    
     if (keyFile.has_key ("Vignetting Correction", "Amount")) vignetting.amount = keyFile.get_integer ("Vignetting Correction", "Amount");
@@ -628,6 +641,8 @@ bool ProcParams::operator== (const ProcParams& other) {
         && distortion.amount == other.distortion.amount
         && cacorrection.red == other.cacorrection.red
         && cacorrection.blue == other.cacorrection.blue
+        && rawdemosaic.ccSteps == other.rawdemosaic.ccSteps
+        && rawdemosaic.dmethod == other.rawdemosaic.dmethod
         && vignetting.amount == other.vignetting.amount
         && vignetting.radius == other.vignetting.radius
         && !memcmp (&chmixer.red, &other.chmixer.red, 3*sizeof(int))

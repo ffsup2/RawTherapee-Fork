@@ -101,12 +101,12 @@ class Preferences : public Gtk::Dialog {
     Options moptions;
     sigc::connection dmconn, tconn, addc, setc;
 
-    void fillPreferences ();
-    void storePreferences ();
-    void parseDir       (Glib::ustring dirname, std::vector<Glib::ustring>& items, Glib::ustring ext);
+    void fillPreferences (){};
+    void storePreferences (){};
+
     void dmethodChanged ();
 
-    void themeChanged ();
+    //void themeChanged ();
 
     void appendBehavList (Gtk::TreeModel::iterator& parent, Glib::ustring label, bool set);
 
@@ -117,25 +117,113 @@ class Preferences : public Gtk::Dialog {
     Gtk::Widget* getBatchProcPanel ();
     
   public:
-         Preferences (int initialPage=0);
+    static void parseDir       (Glib::ustring dirname, std::vector<Glib::ustring>& items, Glib::ustring ext);
+    Preferences (int initialPage=0);
     
-    void savePressed ();
-    void loadPressed ();
-    void okPressed ();
-    void cancelPressed ();
     void aboutPressed ();
 
-    void selectStartupDir ();
-    void addExtPressed ();
-    void delExtPressed ();
+    //void selectStartupDir ();
+    //void addExtPressed ();
+    //void delExtPressed ();
 
-    void clearProfilesPressed ();
-    void clearThumbImagesPressed ();
-    void clearAllPressed ();
+    //void clearProfilesPressed ();
+    //void clearThumbImagesPressed ();
+    //void clearAllPressed ();
     void behAddRadioToggled (const Glib::ustring& path);
     void behSetRadioToggled (const Glib::ustring& path);
 //    void selectICCProfileDir ();
 //    void selectMonitorProfile ();
+};
+
+class GlobalPreferencesPanel : public Gtk::VBox {
+    class ExtensionColumns : public Gtk::TreeModel::ColumnRecord {
+        public:
+            Gtk::TreeModelColumn<bool>  enabled;
+            Gtk::TreeModelColumn<Glib::ustring>  ext;
+            ExtensionColumns() { add(enabled); add(ext); }
+    };
+    ExtensionColumns extensionColumns;
+    Glib::RefPtr<Gtk::ListStore> extensionModel;
+
+protected:
+    // Thumbnail options
+    Gtk::ComboBoxText* cformat; // Format of cached thumb
+    Gtk::SpinButton*   maxThumbSize;
+    Gtk::CheckButton*  showDateTime;
+    Gtk::CheckButton*  showBasicExif;
+    Gtk::CheckButton*  overlayedFileNames;
+    Gtk::SpinButton*   maxCacheEntries;
+    Gtk::Button*       clearThumbnails;
+    Gtk::Button*       clearProfiles;
+    Gtk::Button*       clearAll;
+
+    // Startup directory
+    Gtk::RadioButton* sdcurrent;
+    Gtk::RadioButton* sdlast;
+    Gtk::RadioButton* sdhome;
+    Gtk::RadioButton* sdother;
+    Gtk::Entry* startupdir; // Startup directory for other
+    Gtk::Button* sdselect;
+
+    // File extension
+    Gtk::TreeView*  extensions; // List of current extensions
+    Gtk::Entry*     extension;
+    Gtk::Button*    addExt;
+    Gtk::Button*    delExt;
+
+    // Color Management
+    Gtk::ComboBoxText* intent;
+    Gtk::FileChooserButton* iccDir;
+    Gtk::FileChooserButton* monProfile;
+
+    // Blink options
+    Gtk::CheckButton* blinkClipped;
+	Gtk::SpinButton*  hlThresh;
+	Gtk::SpinButton*  shThresh;
+
+	// Processing parameters save options
+    Gtk::ComboBoxText* rprofiles; // Processing profile for RAW
+    Gtk::ComboBoxText* iprofiles; // Processing profile for other images
+    Gtk::CheckButton* saveParamsFile; // Save next to file
+    Gtk::CheckButton* saveParamsCache; // Save in cache
+    Gtk::ComboBoxText* loadParamsPreference;
+
+    Gtk::ComboBoxText* languages; // Default language: need restart
+    Gtk::ComboBoxText* theme; // Color theme
+    Gtk::Entry* dateformat; // Formatting string for date
+
+    Gtk::FileChooserButton* gimpDir; // Directory for GIMP
+    Gtk::FileChooserButton* psDir;   // Directory for Photoshop
+    Gtk::Entry* editorToSendTo; // other editor
+    Gtk::RadioButton* edGimp;
+    Gtk::RadioButton* edPS;
+    Gtk::RadioButton* edOther;
+
+    Gtk::Widget* createPanelThumbnails();
+    Gtk::Widget* createPanelFiles();
+    Gtk::Widget* createPanelAppearance();
+    Gtk::Widget* createPanelClipping();
+    Gtk::Widget* createPanelProfiles();
+    Gtk::Widget* createPanelColor();
+    Gtk::Widget* createPanelExternals();
+
+    void fillPreferences ();
+    void connectEvents ();
+    void storePreferences ();
+
+
+    void selectStartupDir ();
+    void selectStartup ();
+    void addExtPressed ();
+    void delExtPressed ();
+    void paramChanged();
+    void themeChanged ();
+    void thumbChanged();
+    void clearProfilesPressed ();
+    void clearThumbImagesPressed ();
+    void clearAllPressed ();
+public:
+    GlobalPreferencesPanel();
 };
 
 #endif

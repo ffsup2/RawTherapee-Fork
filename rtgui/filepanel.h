@@ -29,6 +29,7 @@
 #include <pparamschangelistener.h>
 #include <history.h>
 #include <filterpanel.h>
+#include <preferences.h>
 
 class RTWindow;
 class FilePanel : public Gtk::HPaned,
@@ -37,6 +38,8 @@ class FilePanel : public Gtk::HPaned,
 {
 
     protected:
+		Gtk::HBox* leftBox;
+		Gtk::Notebook* leftNotebook;
         Gtk::VPaned* placespaned;
         Gtk::HPaned* dirpaned;
         DirBrowser* dirBrowser;
@@ -47,8 +50,8 @@ class FilePanel : public Gtk::HPaned,
         BatchToolPanelCoordinator* tpc;
         History* history;
 		FilterPanel* filterPanel;
+		GlobalPreferencesPanel* preferencesPanel;
         RTWindow* parent;      
-        Gtk::Notebook* rightNotebook;
 
     public:
         FilePanel ();

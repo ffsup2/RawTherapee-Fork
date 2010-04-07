@@ -117,6 +117,7 @@ class Options {
     
     std::vector<double> thumbnailZoomRatios;
     bool overlayedFileNames;
+    bool showFileNames;
     
     
                 Options         ();

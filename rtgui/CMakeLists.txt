@@ -10,6 +10,7 @@ set (BASESOURCEFILES
     colordenoise.cc
     exifpanel.cc
     sharpening.cc
+	RawDemosaicing.cc
     whitebalance.cc   vignetting.cc rotate.cc distortion.cc
     crophandler.cc curveeditor.cc dirbrowser.cc
     filecatalog.cc

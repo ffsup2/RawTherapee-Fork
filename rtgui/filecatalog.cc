@@ -104,6 +104,15 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb) : listener(NULL), fslist
     bRank[4]->set_tooltip_text (M("FILEBROWSER_SHOWRANK5HINT"));
     buttonBar->pack_start (*(new Gtk::VSeparator), Gtk::PACK_SHRINK);
 
+    exifInfo = Gtk::manage(new Gtk::ToggleButton ());
+    exifInfo->set_image (*(new Gtk::Image (argv0+"/images/info.png")));
+    exifInfo->set_relief (Gtk::RELIEF_NONE);
+    exifInfo->set_active( options.showFileNames );
+    exifInfo->signal_toggled().connect(sigc::mem_fun(*this, &FileCatalog::exifInfoButtonToggled));
+    buttonBar->pack_start (*exifInfo, Gtk::PACK_SHRINK);
+
+    buttonBar->pack_start (*(new Gtk::VSeparator), Gtk::PACK_SHRINK);
+
     bTrash = new Gtk::ToggleButton ();
     bTrash->set_image (*(new Gtk::Image (Gtk::StockID("gtk-delete"), Gtk::ICON_SIZE_SMALL_TOOLBAR)));
     bTrash->set_relief (Gtk::RELIEF_NONE);
@@ -167,6 +176,12 @@ FileCatalog::FileCatalog (CoarsePanel* cp, ToolBar* tb) : listener(NULL), fslist
     checkCounter = 2;
     g_timeout_add (CHECKTIME, _directoryUpdater, this);
 #endif
+}
+
+void FileCatalog::exifInfoButtonToggled()
+{
+   options.showFileNames =  exifInfo->get_active();
+   fileBrowser->refreshThumbImages ();
 }
 
 void FileCatalog::on_realize() {

@@ -225,6 +225,16 @@ class CACorrParams {
 };
 
 /**
+  * Parameters for RAW demosaicing
+  */
+class RAWParams {
+
+    public:
+        int ccSteps;
+        Glib::ustring dmethod;
+};
+
+/**
   * Parameters of the highlight recovery
   */
 class HRecParams {
@@ -300,6 +310,7 @@ class ProcParams {
         RotateParams            rotate;         ///< Rotation parameters
         DistortionParams        distortion;     ///< Lens distortion correction parameters
         CACorrParams            cacorrection;   ///< Lens c/a correction parameters
+        RAWParams               rawdemosaic;    ///< RAW demosaicing
         VignettingParams        vignetting;     ///< Lens vignetting correction parameters
         ChannelMixerParams      chmixer;        ///< Channel mixer parameters
         HRecParams              hlrecovery;     ///< Highlight recovery parameters

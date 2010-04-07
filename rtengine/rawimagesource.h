@@ -80,6 +80,7 @@ class RawImageSource : public ImageSource {
         // the interpolated green plane:
         unsigned short** green; 
     
+        void GreenCompensation();
         void hphd_vertical       (float** hpmap, int col_from, int col_to);
         void hphd_horizontal     (float** hpmap, int row_from, int row_to);
         void hphd_green          (int row_from, int row_to);
@@ -99,7 +100,8 @@ class RawImageSource : public ImageSource {
         ~RawImageSource ();
     
         int         load        (Glib::ustring fname);
-        void        getImage    (ColorTemp ctemp, int tran, Image16* image, PreviewProps pp, HRecParams hrp, ColorManagementParams cmp);
+        int         demosaic    (Glib::ustring method);
+        void        getImage    (ColorTemp ctemp, int tran, Image16* image, PreviewProps pp, HRecParams hrp, ColorManagementParams cmp, RAWParams raw);
         ColorTemp   getWB       () { return wb; }
         ColorTemp   getAutoWB   ();
         ColorTemp   getSpotWB   (std::vector<Coord2D> red, std::vector<Coord2D> green, std::vector<Coord2D>& blue, int tran);
