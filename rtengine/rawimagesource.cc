@@ -3056,8 +3056,8 @@ void RawImageSource::dcb_demosaic(int iterations, int dcb_enhance)
 		hid2(image);
 		dcb_map(image);
 		dcb_correction(image);
-		i++;
 		if(plistener) plistener->setProgress (0.33*i/iterations);
+		i++;
         }
         if(plistener) plistener->setProgress (0.33);
 
