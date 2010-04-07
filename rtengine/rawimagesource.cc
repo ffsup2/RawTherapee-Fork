@@ -782,7 +782,7 @@ int RawImageSource::load (Glib::ustring fname) {
         else if (settings->demosaicMethod=="ppg")
             ppg_demosaic ();
         else if (settings->demosaicMethod=="dcb")
-            dcb_demosaic (2, 1);
+            dcb_demosaic(settings->dcb_iterations, settings->dcb_enhance? 1:0);
         else
             eahd_demosaic ();
     }
