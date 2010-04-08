@@ -9,22 +9,21 @@ function checkLink {
 
 	#otool -L $FILE
 
-	otool -L $FILE | grep -v 'RawTherapee.app' | grep -v '/opt/local' | grep -v '/usr/' | grep -v '/System/' | grep -v "@executable_path" | cut -f 1 -d ' ' | while read X
+	otool -L $FILE | grep -v 'RawTherapee.app' | grep -v '/usr/lib' | grep -v '/System/' | grep -v "@executable_path" | cut -f 1 -d ' ' | while read X
 	do 
 		local NAME=`basename "$X"`
-		if [ ! -f "RawTherapee.app/Contents/Frameworks/$NAME" ]
+		if [ ! -f "RawTherapee.app/Contents/MacOS/lib/$NAME" ]
 		then
 			#echo "Copy $X to Frameworks"
-			cp $X "RawTherapee.app/Contents/Frameworks/$NAME"
+			cp $X "RawTherapee.app/Contents/MacOS/lib/$NAME"
 		
 			#Recursively update the linkage of libraries
-			checkLink "RawTherapee.app/Contents/Frameworks/$NAME"
+			checkLink "RawTherapee.app/Contents/MacOS/lib/$NAME"
 		fi
-
-		echo "$FILE: Changing link $X to @executable_path/../Frameworks/$NAME"
-		install_name_tool -change $X "@executable_path/../Frameworks/$NAME" $FILE
 	done
 }
+
+MACPORTS_PREFIX=/usr/local/rawtherapee
 
 if [ ! -d release ]; then
 	echo "Please run this from the root of the project; i.e. './tools/osx/make-app-bundle'."
@@ -33,13 +32,26 @@ fi
 
 rm -rf "RawTherapee.app"
 mkdir -p "RawTherapee.app/Contents/Resources"
-mkdir -p "RawTherapee.app/Contents/MacOS"
-mkdir -p "RawTherapee.app/Contents/Frameworks"
+mkdir -p "RawTherapee.app/Contents/MacOS/lib"
+mkdir -p "RawTherapee.app/Contents/MacOS/share/mime"
 
+#Copy over non-explicitly linked libraries
+cp -R $MACPORTS_PREFIX/lib/pango RawTherapee.app/Contents/MacOS/lib
+cp -R $MACPORTS_PREFIX/lib/gtk-2.0 RawTherapee.app/Contents/MacOS/lib
+
+#Copy over mime definiteions
+cp -R /usr/local/rawtherapee/share/mime/* RawTherapee.app/Contents/MacOS/share/mime
+
+#Copy over etc files, and modify as needed
+cp -R /usr/local/rawtherapee/etc RawTherapee.app/Contents/MacOS
+
+#Copy over the RawTherapee release
 cp -R release/* RawTherapee.app/Contents/MacOS
 
+#Copy application-specific stuff like icons and startup script
 cp tools/osx/Info.plist RawTherapee.app/Contents
 cp tools/osx/RawTherapee.icns RawTherapee.app/Contents/Resources
+cp tools/osx/rtstart RawTherapee.app/Contents/MacOS
 
-#Copy and relink the needed libraries
+#Copy and relink the explicitly defined libraries
 checkLink "RawTherapee.app/Contents/MacOS/rt"
