@@ -104,17 +104,17 @@ class Preferences : public Gtk::Dialog {
     void fillPreferences (){};
     void storePreferences (){};
 
-    void dmethodChanged ();
+    //void dmethodChanged ();
 
     //void themeChanged ();
 
-    void appendBehavList (Gtk::TreeModel::iterator& parent, Glib::ustring label, bool set);
+    //void appendBehavList (Gtk::TreeModel::iterator& parent, Glib::ustring label, bool set);
 
     Gtk::Widget* getProcParamsPanel ();
     Gtk::Widget* getColorManagementPanel ();
     Gtk::Widget* getFileBrowserPanel ();
     Gtk::Widget* getGeneralPanel ();
-    Gtk::Widget* getBatchProcPanel ();
+    //Gtk::Widget* getBatchProcPanel ();
     
   public:
     static void parseDir       (Glib::ustring dirname, std::vector<Glib::ustring>& items, Glib::ustring ext);
@@ -129,13 +129,33 @@ class Preferences : public Gtk::Dialog {
     //void clearProfilesPressed ();
     //void clearThumbImagesPressed ();
     //void clearAllPressed ();
-    void behAddRadioToggled (const Glib::ustring& path);
-    void behSetRadioToggled (const Glib::ustring& path);
+    //void behAddRadioToggled (const Glib::ustring& path);
+    //void behSetRadioToggled (const Glib::ustring& path);
 //    void selectICCProfileDir ();
 //    void selectMonitorProfile ();
 };
 
-class GlobalPreferencesPanel : public Gtk::VBox {
+class BehaviourPanel : public Gtk::VBox {
+    class BehavColumns : public Gtk::TreeModel::ColumnRecord {
+        public:
+            Gtk::TreeModelColumn<Glib::ustring> label;
+            Gtk::TreeModelColumn<bool>          badd;
+            Gtk::TreeModelColumn<bool>          bset;
+            Gtk::TreeModelColumn<bool>          visible;
+            BehavColumns() { add(label); add(badd); add(bset); add(visible);}
+    };
+    Glib::RefPtr<Gtk::TreeStore> behModel;
+    BehavColumns behavColumns;
+
+    void appendBehavList (Gtk::TreeModel::iterator& parent, Glib::ustring label, bool set);
+    void behAddRadioToggled (const Glib::ustring& path);
+    void behSetRadioToggled (const Glib::ustring& path);
+
+public:
+    BehaviourPanel();
+};
+
+class PreferencesPanel : public Gtk::VBox {
     class ExtensionColumns : public Gtk::TreeModel::ColumnRecord {
         public:
             Gtk::TreeModelColumn<bool>  enabled;
@@ -223,7 +243,7 @@ protected:
     void clearThumbImagesPressed ();
     void clearAllPressed ();
 public:
-    GlobalPreferencesPanel();
+    PreferencesPanel();
 };
 
 #endif

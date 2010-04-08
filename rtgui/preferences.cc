@@ -75,7 +75,7 @@ Preferences::Preferences (int initialPage)  {
     nb->append_page (*getProcParamsPanel(),     M("PREFERENCES_TAB_IMPROC"));
     nb->append_page (*getFileBrowserPanel(),    M("PREFERENCES_TAB_BROWSER"));
     nb->append_page (*getColorManagementPanel(),M("PREFERENCES_TAB_COLORMGR"));
-    nb->append_page (*getBatchProcPanel(),      "Batch Processing");
+    //nb->append_page (*getBatchProcPanel(),      "Batch Processing");
     nb->set_current_page (initialPage);
 
     //fillPreferences ();
@@ -84,15 +84,15 @@ Preferences::Preferences (int initialPage)  {
     set_modal (true);
 }
 
-Gtk::Widget* Preferences::getBatchProcPanel () {
-
-    Gtk::VBox* mvbpp = Gtk::manage (new Gtk::VBox ());
+//Gtk::Widget* Preferences::getBatchProcPanel () {
+BehaviourPanel::BehaviourPanel(){
+    //Gtk::VBox* mvbpp = Gtk::manage (new Gtk::VBox ());
 
     Gtk::ScrolledWindow* behscrollw = Gtk::manage (new Gtk::ScrolledWindow ());
     behscrollw->set_policy (Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
-    Gtk::Frame* behFrame = Gtk::manage (new Gtk::Frame ("Behavior"));
+    Gtk::Frame* behFrame = Gtk::manage (new Gtk::Frame ());
     behFrame->add (*behscrollw);
-    mvbpp->pack_start (*behFrame);
+    pack_start (*behFrame);
 //    mvbpp->pack_start (*behFrame, Gtk::PACK_SHRINK, 2);
     Gtk::TreeView* behTreeView = Gtk::manage (new Gtk::TreeView ());
     behscrollw->add (*behTreeView);
@@ -109,10 +109,10 @@ Gtk::Widget* Preferences::getBatchProcPanel () {
 
     cr_add->set_radio (true);
     cr_add->set_property("xalign", 0.0f);
-    sigc::connection addc = cr_add->signal_toggled().connect (sigc::mem_fun (*this, &Preferences::behAddRadioToggled));
+    sigc::connection addc = cr_add->signal_toggled().connect (sigc::mem_fun (*this, &BehaviourPanel::behAddRadioToggled));
     cr_set->set_radio (true);
     cr_set->set_property("xalign", 0.0f);
-    sigc::connection setc = cr_set->signal_toggled().connect (sigc::mem_fun (*this, &Preferences::behSetRadioToggled));
+    sigc::connection setc = cr_set->signal_toggled().connect (sigc::mem_fun (*this, &BehaviourPanel::behSetRadioToggled));
 
     behTreeView->get_column (1)->add_attribute (*cr_add, "visible", behavColumns.visible);
     behTreeView->get_column (1)->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
@@ -184,10 +184,10 @@ Gtk::Widget* Preferences::getBatchProcPanel () {
 
     behTreeView->expand_all ();
 
-    return mvbpp;
+    //return mvbpp;
 }
 
-void Preferences::appendBehavList (Gtk::TreeModel::iterator& parent, Glib::ustring label, bool set) {
+void BehaviourPanel::appendBehavList (Gtk::TreeModel::iterator& parent, Glib::ustring label, bool set) {
 
     Gtk::TreeModel::iterator ci = behModel->append (parent->children());
     ci->set_value (behavColumns.label, label);
@@ -196,20 +196,29 @@ void Preferences::appendBehavList (Gtk::TreeModel::iterator& parent, Glib::ustri
     ci->set_value (behavColumns.bset, set);
 }
 
-void Preferences::behAddRadioToggled (const Glib::ustring& path) {
+void BehaviourPanel::behAddRadioToggled (const Glib::ustring& path) {
 
     Gtk::TreeModel::iterator iter = behModel->get_iter (path);
     bool set = iter->get_value (behavColumns.bset);
     iter->set_value (behavColumns.bset, false);
     iter->set_value (behavColumns.badd, true);
+
+    options.baBehav.clear ();
+	for (Gtk::TreeIter sections=behModel->children().begin();  sections!=behModel->children().end(); sections++)
+		for (Gtk::TreeIter adjs=sections->children().begin();  adjs!=sections->children().end(); adjs++)
+			options.baBehav.push_back (adjs->get_value (behavColumns.badd));
 }
 
-void Preferences::behSetRadioToggled (const Glib::ustring& path) {
+void BehaviourPanel::behSetRadioToggled (const Glib::ustring& path) {
 
     Gtk::TreeModel::iterator iter = behModel->get_iter (path);
     bool add = iter->get_value (behavColumns.badd);
     iter->set_value (behavColumns.bset, true);
     iter->set_value (behavColumns.badd, false);
+    options.baBehav.clear ();
+	for (Gtk::TreeIter sections=behModel->children().begin();  sections!=behModel->children().end(); sections++)
+		for (Gtk::TreeIter adjs=sections->children().begin();  adjs!=sections->children().end(); adjs++)
+			options.baBehav.push_back (adjs->get_value (behavColumns.badd));
 }
 
 Gtk::Widget* Preferences::getProcParamsPanel () {
@@ -282,7 +291,7 @@ Gtk::Widget* Preferences::getProcParamsPanel () {
         iprofiles->append_text (pnames[i]);
     }
 
-    dmconn = dmethod->signal_changed().connect( sigc::mem_fun(*this, &Preferences::dmethodChanged) );
+    //dmconn = dmethod->signal_changed().connect( sigc::mem_fun(*this, &Preferences::dmethodChanged) );
 
     return mvbpp;
 }
@@ -623,7 +632,7 @@ Gtk::Widget* Preferences::getFileBrowserPanel () {
     return mvbfb;
 }
 
-Gtk::Widget* GlobalPreferencesPanel::createPanelThumbnails()
+Gtk::Widget* PreferencesPanel::createPanelThumbnails()
 {
     Gtk::VBox* vbc = Gtk::manage(new Gtk::VBox ());
 
@@ -673,7 +682,7 @@ Gtk::Widget* GlobalPreferencesPanel::createPanelThumbnails()
     return vbc;
 }
 
-Gtk::Widget* GlobalPreferencesPanel::createPanelFiles()
+Gtk::Widget* PreferencesPanel::createPanelFiles()
 {
     Gtk::VBox *vbFiles = new Gtk::VBox();
     Gtk::Frame* fsd = new Gtk::Frame (M("PREFERENCES_STARTUPIMDIR"));
@@ -738,7 +747,7 @@ Gtk::Widget* GlobalPreferencesPanel::createPanelFiles()
     return vbFiles;
 }
 
-Gtk::Widget* GlobalPreferencesPanel::createPanelAppearance()
+Gtk::Widget* PreferencesPanel::createPanelAppearance()
 {
     Gtk::VBox *vbAppear = new Gtk::VBox();
 
@@ -779,7 +788,7 @@ Gtk::Widget* GlobalPreferencesPanel::createPanelAppearance()
     return vbAppear;
 }
 
-Gtk::Widget* GlobalPreferencesPanel::createPanelClipping()
+Gtk::Widget* PreferencesPanel::createPanelClipping()
 {
 	Gtk::VBox* vbrl = new Gtk::VBox ();
 
@@ -809,7 +818,7 @@ Gtk::Widget* GlobalPreferencesPanel::createPanelClipping()
     return vbrl;
 }
 
-Gtk::Widget* GlobalPreferencesPanel::createPanelProfiles()
+Gtk::Widget* PreferencesPanel::createPanelProfiles()
 {
     Gtk::VBox* vbdp = Gtk::manage (new Gtk::VBox ());
     Gtk::HBox* hb1 = new Gtk::HBox ();
@@ -817,14 +826,14 @@ Gtk::Widget* GlobalPreferencesPanel::createPanelProfiles()
     rprofiles = Gtk::manage (new Gtk::ComboBoxText ());
     hb1->pack_start(*drlab, Gtk::PACK_SHRINK, 4);
     hb1->pack_start( *rprofiles );
-    vbdp->pack_start(*hb1);
+    vbdp->pack_start(*hb1,Gtk::PACK_SHRINK, 4);
 
     Gtk::HBox* hb2 = new Gtk::HBox ();
     Gtk::Label* drimg = Gtk::manage (new Gtk::Label (M("PREFERENCES_FORIMAGE")+":"));
     iprofiles = Gtk::manage (new Gtk::ComboBoxText ());
     hb2->pack_start(*drimg,Gtk::PACK_SHRINK, 4);
     hb2->pack_start(*iprofiles);
-    vbdp->pack_start(*hb2);
+    vbdp->pack_start(*hb2,Gtk::PACK_SHRINK, 4);
 
     std::vector<Glib::ustring> pnames;
     if (options.multiUser)
@@ -849,7 +858,7 @@ Gtk::Widget* GlobalPreferencesPanel::createPanelProfiles()
     return vbdp;
 }
 
-Gtk::Widget* GlobalPreferencesPanel::createPanelColor()
+Gtk::Widget* PreferencesPanel::createPanelColor()
 {
 	Gtk::VBox *vb = new Gtk::VBox();
 
@@ -881,7 +890,7 @@ Gtk::Widget* GlobalPreferencesPanel::createPanelColor()
 }
 
 
-Gtk::Widget* GlobalPreferencesPanel::createPanelExternals()
+Gtk::Widget* PreferencesPanel::createPanelExternals()
 {
     Gtk::VBox* dgvb = new Gtk::VBox ();
 
@@ -932,7 +941,7 @@ Gtk::Widget* GlobalPreferencesPanel::createPanelExternals()
     return dgvb;
 }
 
-GlobalPreferencesPanel::GlobalPreferencesPanel()
+PreferencesPanel::PreferencesPanel()
 {
     Gtk::VBox* mvbfb = new Gtk::VBox ();
     mvbfb->set_border_width (4);
@@ -950,7 +959,7 @@ GlobalPreferencesPanel::GlobalPreferencesPanel()
     mvbfb->pack_start (*expFiles, Gtk::PACK_SHRINK, 4);
 
     // APPEARANCE
-    Gtk::Expander *expAppear = Gtk::manage(new Gtk::Expander("Appearance"));
+    Gtk::Expander *expAppear = Gtk::manage(new Gtk::Expander(Glib::ustring("<b>") + "Appearance" + "</b>"));
     expAppear->set_use_markup (true);
     expAppear->add( *createPanelAppearance() );
     mvbfb->pack_start (*expAppear, Gtk::PACK_SHRINK, 4);
@@ -987,51 +996,51 @@ GlobalPreferencesPanel::GlobalPreferencesPanel()
     connectEvents();
 }
 
-void GlobalPreferencesPanel::connectEvents ()
+void PreferencesPanel::connectEvents ()
 {
     //THUMBNAILS OPTIONS
-    cformat->signal_changed().connect(  sigc::mem_fun(*this, &GlobalPreferencesPanel::paramChanged) );
-    maxThumbSize->signal_changed().connect(  sigc::mem_fun(*this, &GlobalPreferencesPanel::thumbChanged) );
-    showDateTime->signal_clicked().connect(  sigc::mem_fun(*this, &GlobalPreferencesPanel::thumbChanged) );
-    showBasicExif->signal_clicked().connect(  sigc::mem_fun(*this, &GlobalPreferencesPanel::thumbChanged) );
-    overlayedFileNames->signal_clicked().connect(  sigc::mem_fun(*this, &GlobalPreferencesPanel::thumbChanged) );
-    maxCacheEntries->signal_changed().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::paramChanged) );
-    clearThumbnails->signal_clicked().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::clearThumbImagesPressed) );
-    clearProfiles->signal_clicked().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::clearProfilesPressed) );
-    clearAll->signal_clicked().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::clearAllPressed) );
+    cformat->signal_changed().connect(  sigc::mem_fun(*this, &PreferencesPanel::paramChanged) );
+    maxThumbSize->signal_changed().connect(  sigc::mem_fun(*this, &PreferencesPanel::thumbChanged) );
+    showDateTime->signal_clicked().connect(  sigc::mem_fun(*this, &PreferencesPanel::thumbChanged) );
+    showBasicExif->signal_clicked().connect(  sigc::mem_fun(*this, &PreferencesPanel::thumbChanged) );
+    overlayedFileNames->signal_clicked().connect(  sigc::mem_fun(*this, &PreferencesPanel::thumbChanged) );
+    maxCacheEntries->signal_changed().connect( sigc::mem_fun(*this, &PreferencesPanel::paramChanged) );
+    clearThumbnails->signal_clicked().connect( sigc::mem_fun(*this, &PreferencesPanel::clearThumbImagesPressed) );
+    clearProfiles->signal_clicked().connect( sigc::mem_fun(*this, &PreferencesPanel::clearProfilesPressed) );
+    clearAll->signal_clicked().connect( sigc::mem_fun(*this, &PreferencesPanel::clearAllPressed) );
 
     // FILES
-    addExt->signal_clicked().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::addExtPressed) );
-    delExt->signal_clicked().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::delExtPressed) );
-    extension->signal_activate().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::addExtPressed) );
-    sdselect->signal_clicked().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::selectStartupDir) );
-    sdcurrent->signal_clicked().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::selectStartup) );
+    addExt->signal_clicked().connect( sigc::mem_fun(*this, &PreferencesPanel::addExtPressed) );
+    delExt->signal_clicked().connect( sigc::mem_fun(*this, &PreferencesPanel::delExtPressed) );
+    extension->signal_activate().connect( sigc::mem_fun(*this, &PreferencesPanel::addExtPressed) );
+    sdselect->signal_clicked().connect( sigc::mem_fun(*this, &PreferencesPanel::selectStartupDir) );
+    sdcurrent->signal_clicked().connect( sigc::mem_fun(*this, &PreferencesPanel::selectStartup) );
 
     // APPEARANCE
-    theme->signal_changed().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::themeChanged) );
-    languages->signal_changed().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::paramChanged) );
-    dateformat->signal_editing_done().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::paramChanged) );
+    theme->signal_changed().connect( sigc::mem_fun(*this, &PreferencesPanel::themeChanged) );
+    languages->signal_changed().connect( sigc::mem_fun(*this, &PreferencesPanel::paramChanged) );
+    dateformat->signal_editing_done().connect( sigc::mem_fun(*this, &PreferencesPanel::paramChanged) );
 
     // CLIPPING
-    blinkClipped->signal_clicked().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::paramChanged) );
-    hlThresh->signal_changed().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::paramChanged) );
-    shThresh->signal_changed().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::paramChanged) );
+    blinkClipped->signal_clicked().connect( sigc::mem_fun(*this, &PreferencesPanel::paramChanged) );
+    hlThresh->signal_changed().connect( sigc::mem_fun(*this, &PreferencesPanel::paramChanged) );
+    shThresh->signal_changed().connect( sigc::mem_fun(*this, &PreferencesPanel::paramChanged) );
 
     // PROFILES
-    rprofiles->signal_changed().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::paramChanged) );
-    iprofiles->signal_changed().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::paramChanged) );
-    saveParamsFile->signal_clicked().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::paramChanged) );
-    saveParamsCache->signal_clicked().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::paramChanged) );
-    loadParamsPreference->signal_changed().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::paramChanged) );
+    rprofiles->signal_changed().connect( sigc::mem_fun(*this, &PreferencesPanel::paramChanged) );
+    iprofiles->signal_changed().connect( sigc::mem_fun(*this, &PreferencesPanel::paramChanged) );
+    saveParamsFile->signal_clicked().connect( sigc::mem_fun(*this, &PreferencesPanel::paramChanged) );
+    saveParamsCache->signal_clicked().connect( sigc::mem_fun(*this, &PreferencesPanel::paramChanged) );
+    loadParamsPreference->signal_changed().connect( sigc::mem_fun(*this, &PreferencesPanel::paramChanged) );
 
     // COLOR
-    intent->signal_changed().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::paramChanged) );
-    iccDir->signal_file_set().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::paramChanged) );
-    monProfile->signal_file_set().connect( sigc::mem_fun(*this, &GlobalPreferencesPanel::paramChanged) );
+    intent->signal_changed().connect( sigc::mem_fun(*this, &PreferencesPanel::paramChanged) );
+    iccDir->signal_file_set().connect( sigc::mem_fun(*this, &PreferencesPanel::paramChanged) );
+    monProfile->signal_file_set().connect( sigc::mem_fun(*this, &PreferencesPanel::paramChanged) );
 
 }
 
-void GlobalPreferencesPanel::paramChanged()
+void PreferencesPanel::paramChanged()
 {
 	storePreferences();
 }
@@ -1057,7 +1066,7 @@ void Preferences::parseDir (Glib::ustring dirname, std::vector<Glib::ustring>& i
     delete dir;
 }
 
-void GlobalPreferencesPanel::storePreferences ()
+void PreferencesPanel::storePreferences ()
 {
     options.defProfRaw          = rprofiles->get_active_text();
     options.defProfImg          = iprofiles->get_active_text();
@@ -1111,7 +1120,7 @@ void GlobalPreferencesPanel::storePreferences ()
     */
 }
 
-void GlobalPreferencesPanel::fillPreferences ()
+void PreferencesPanel::fillPreferences ()
 {
     rprofiles->set_active_text (options.defProfRaw);
     iprofiles->set_active_text (options.defProfImg);
@@ -1191,7 +1200,7 @@ void GlobalPreferencesPanel::fillPreferences ()
     */
 }
 
-void GlobalPreferencesPanel::selectStartupDir () {
+void PreferencesPanel::selectStartupDir () {
 
     Gtk::FileChooserDialog dialog(M("PREFERENCES_DIRSELECTDLG"), Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
 //    dialog.set_transient_for(*this);
@@ -1207,7 +1216,7 @@ void GlobalPreferencesPanel::selectStartupDir () {
         options.startupPath  = dialog.get_filename();
     }
 }
-void GlobalPreferencesPanel::selectStartup() {
+void PreferencesPanel::selectStartup() {
     if (sdcurrent->get_active ())
         options.startupDir = STARTUPDIR_CURRENT;
     else if (sdhome->get_active ())
@@ -1220,16 +1229,6 @@ void GlobalPreferencesPanel::selectStartup() {
     }
 }
 
-void Preferences::dmethodChanged () {
-
-    if (dmethod->get_active_row_number()==0)
-        ccSteps->set_value (2);
-    else if (dmethod->get_active_row_number()==1)
-        ccSteps->set_value (1);
-    else if (dmethod->get_active_row_number()==2)
-        ccSteps->set_value (2);
-}
-
 void Preferences::aboutPressed () {
 
     Splash* splash = new Splash (-1);
@@ -1238,14 +1237,14 @@ void Preferences::aboutPressed () {
     splash->show ();
 }
 
-void GlobalPreferencesPanel::thumbChanged(){
+void PreferencesPanel::thumbChanged(){
     options.fbShowDateTime  = showDateTime->get_active ();
     options.fbShowBasicExif = showBasicExif->get_active ();
     options.maxThumbnailHeight = (int)maxThumbSize->get_value ();
     options.overlayedFileNames = overlayedFileNames->get_active ();
 }
 
-void GlobalPreferencesPanel::themeChanged () {
+void PreferencesPanel::themeChanged () {
 	options.theme  = theme->get_active_text ();
 	std::vector<Glib::ustring> files;
 	files.push_back (argv0+"/themes/"+theme->get_active_text ());
@@ -1255,7 +1254,7 @@ void GlobalPreferencesPanel::themeChanged () {
 	gdk_event_send_clientmessage_toall ((GdkEvent*)&event);
 }
 
-void GlobalPreferencesPanel::addExtPressed () {
+void PreferencesPanel::addExtPressed () {
 
   Gtk::TreeNodeChildren c = extensionModel->children ();
   for (int i=0; i<c.size(); i++)
@@ -1277,7 +1276,7 @@ void GlobalPreferencesPanel::addExtPressed () {
   }
 }
 
-void GlobalPreferencesPanel::delExtPressed () {
+void PreferencesPanel::delExtPressed () {
 
     extensionModel->erase (extensions->get_selection()->get_selected ());
 
@@ -1291,7 +1290,7 @@ void GlobalPreferencesPanel::delExtPressed () {
     }
 }
 
-void GlobalPreferencesPanel::clearProfilesPressed () {
+void PreferencesPanel::clearProfilesPressed () {
 
     Gtk::MessageDialog md ( M("PREFERENCES_CLEARDLG_LINE1"), false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_NONE, true);
     md.set_secondary_text (M("PREFERENCES_CLEARDLG_LINE2"));
@@ -1302,7 +1301,7 @@ void GlobalPreferencesPanel::clearProfilesPressed () {
     md.hide ();
 }
 
-void GlobalPreferencesPanel::clearThumbImagesPressed () {
+void PreferencesPanel::clearThumbImagesPressed () {
 
     Gtk::MessageDialog md ( M("PREFERENCES_CLEARDLG_LINE1"), false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_NONE, true);
     md.set_secondary_text (M("PREFERENCES_CLEARDLG_LINE2"));
@@ -1313,7 +1312,7 @@ void GlobalPreferencesPanel::clearThumbImagesPressed () {
     md.hide ();
 }
 
-void GlobalPreferencesPanel::clearAllPressed () {
+void PreferencesPanel::clearAllPressed () {
 
     Gtk::MessageDialog md ( M("PREFERENCES_CLEARDLG_LINE1"), false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_NONE, true);
     md.set_secondary_text (M("PREFERENCES_CLEARDLG_LINE2"));

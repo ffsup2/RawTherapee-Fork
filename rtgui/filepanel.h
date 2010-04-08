@@ -50,7 +50,8 @@ class FilePanel : public Gtk::HPaned,
         BatchToolPanelCoordinator* tpc;
         History* history;
 		FilterPanel* filterPanel;
-		GlobalPreferencesPanel* preferencesPanel;
+		PreferencesPanel* preferencesPanel;
+		BehaviourPanel* baPanel;
         RTWindow* parent;      
 
     public:

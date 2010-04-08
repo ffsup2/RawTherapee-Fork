@@ -76,12 +76,16 @@ FilePanel::FilePanel () : parent(NULL) {
     fileCatalog->setImageAreaToolListener (tpc);
 
     Gtk::ScrolledWindow *sOptionsPanel = new Gtk::ScrolledWindow();
-    preferencesPanel = new GlobalPreferencesPanel();
+    preferencesPanel = new PreferencesPanel();
     sOptionsPanel->add(*preferencesPanel);
     sOptionsPanel->set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
     Gtk::Label* optLab = new Gtk::Label ("Options");
     leftNotebook->append_page (*sOptionsPanel, *optLab);
     
+    baPanel = new BehaviourPanel();
+    Gtk::Label* baLab = new Gtk::Label ("Behaviour");
+    leftNotebook->append_page (*baPanel, *baLab);
+
     //------------------
     rightBox = new Gtk::HBox ();
 
