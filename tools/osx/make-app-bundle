@@ -24,6 +24,7 @@ function checkLink {
 }
 
 MACPORTS_PREFIX=/usr/local/rawtherapee
+CWD=`pwd`
 
 if [ ! -d release ]; then
 	echo "Please run this from the root of the project; i.e. './tools/osx/make-app-bundle'."
@@ -39,11 +40,12 @@ mkdir -p "RawTherapee.app/Contents/MacOS/share/mime"
 cp -R $MACPORTS_PREFIX/lib/pango RawTherapee.app/Contents/MacOS/lib
 cp -R $MACPORTS_PREFIX/lib/gtk-2.0 RawTherapee.app/Contents/MacOS/lib
 
-#Copy over mime definiteions
+#Copy over mimes (if a mime is copied, and nobody hears, is it really copied?)
 cp -R /usr/local/rawtherapee/share/mime/* RawTherapee.app/Contents/MacOS/share/mime
 
 #Copy over etc files, and modify as needed
 cp -R /usr/local/rawtherapee/etc RawTherapee.app/Contents/MacOS
+sed -i .bak -e 's/\/usr\/local\/rawtherapee/\/Users\/wyatt\/Documents\/Programming\/RawTherapee\/rawtherapee.fork\/RawTherapee.app\/Contents\/MacOS/g' RawTherapee.app/Contents/MacOS/etc/gtk-2.0/gdk-pixbuf.loaders RawTherapee.app/Contents/MacOS/etc/pango/pango*
 
 #Copy over the RawTherapee release
 cp -R release/* RawTherapee.app/Contents/MacOS
