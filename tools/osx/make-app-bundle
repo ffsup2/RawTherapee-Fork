@@ -45,7 +45,7 @@ cp -R /usr/local/rawtherapee/share/mime/* RawTherapee.app/Contents/MacOS/share/m
 
 #Copy over etc files, and modify as needed
 cp -R /usr/local/rawtherapee/etc RawTherapee.app/Contents/MacOS
-sed -i .bak -e 's/\/usr\/local\/rawtherapee/\/Users\/wyatt\/Documents\/Programming\/RawTherapee\/rawtherapee.fork\/RawTherapee.app\/Contents\/MacOS/g' RawTherapee.app/Contents/MacOS/etc/gtk-2.0/gdk-pixbuf.loaders RawTherapee.app/Contents/MacOS/etc/pango/pango*
+sed -i .bak -e 's/\/usr\/local\/rawtherapee/@executable_path/g' RawTherapee.app/Contents/MacOS/etc/gtk-2.0/gdk-pixbuf.loaders RawTherapee.app/Contents/MacOS/etc/pango/pango.modules
 
 #Copy over the RawTherapee release
 cp -R release/* RawTherapee.app/Contents/MacOS
