@@ -36,6 +36,8 @@ extern "C" {
 #include <iptcpairs.h>
 #include <libiptcdata/iptc-jpeg.h>
 
+Glib::ustring safe_locale_to_utf8 (const std::string& src);
+
 using namespace rtengine;
 using namespace rtengine::procparams;
 
@@ -81,7 +83,7 @@ void ImageIO::setMetadata (const rtexif::TagDirectory* eroot, const std::vector<
             for (int j=0; j<iptcc[i].values.size(); j++) {
                 IptcDataSet * ds = iptc_dataset_new ();
                 iptc_dataset_set_tag (ds, IPTC_RECORD_APP_2, IPTC_TAG_KEYWORDS);
-                std::string loc = Glib::locale_from_utf8(iptcc[i].values[j]);
+                std::string loc = safe_locale_to_utf8(iptcc[i].values[j]);
                 iptc_dataset_set_data (ds, (unsigned char*)loc.c_str(), MIN(64,loc.size()), IPTC_DONT_VALIDATE);
                 iptc_data_add_dataset (iptc, ds);
                 iptc_dataset_unref (ds);
@@ -92,7 +94,7 @@ void ImageIO::setMetadata (const rtexif::TagDirectory* eroot, const std::vector<
             for (int j=0; j<iptcc[i].values.size(); j++) {
                 IptcDataSet * ds = iptc_dataset_new ();
                 iptc_dataset_set_tag (ds, IPTC_RECORD_APP_2, IPTC_TAG_SUPPL_CATEGORY);
-                std::string loc = Glib::locale_from_utf8(iptcc[i].values[j]);
+                std::string loc = safe_locale_to_utf8(iptcc[i].values[j]);
                 iptc_dataset_set_data (ds, (unsigned char*)loc.c_str(), MIN(32,loc.size()), IPTC_DONT_VALIDATE);
                 iptc_data_add_dataset (iptc, ds);
                 iptc_dataset_unref (ds);
@@ -103,7 +105,7 @@ void ImageIO::setMetadata (const rtexif::TagDirectory* eroot, const std::vector<
             if (iptcc[i].field == strTags[j].field && iptcc[i].values.size()>0) {
                 IptcDataSet * ds = iptc_dataset_new ();
                 iptc_dataset_set_tag (ds, IPTC_RECORD_APP_2, strTags[j].tag);
-                std::string loc = Glib::locale_from_utf8(iptcc[i].values[0]);
+                std::string loc = safe_locale_to_utf8(iptcc[i].values[0]);
                 iptc_dataset_set_data (ds, (unsigned char*)loc.c_str(), MIN(strTags[j].size,loc.size()), IPTC_DONT_VALIDATE);
                 iptc_data_add_dataset (iptc, ds);
                 iptc_dataset_unref (ds);
