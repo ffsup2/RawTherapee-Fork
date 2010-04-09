@@ -65,6 +65,8 @@ class Options {
     int toolPanelWidth;
     int browserToolPanelWidth;
     int historyPanelWidth;
+    int windowWidth;
+    int windowHeight;
     int dirBrowserWidth;
     int dirBrowserHeight;
     int lastScale;
