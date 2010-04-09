@@ -258,7 +258,7 @@ void FileCatalog::dirSelected (const Glib::ustring& dirname, const Glib::ustring
 #ifdef _WIN32
       wdMonitor = new WinDirMonitor (selectedDirectory, this);
 #elif defined __APPLE__
-      printf("dir->monitor_directory () doesn't work for Mac OS X until now\n");
+      printf("TODO fix dir->monitor_directory () for OSX\n");
 #else  
         dirMonitor = dir->monitor_directory ();
         dirMonitor->signal_changed().connect (sigc::bind(sigc::mem_fun(*this, &FileCatalog::on_dir_changed), false));
