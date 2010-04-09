@@ -6,6 +6,7 @@ RawTherapee.app
 install_manifest.txt
 *.dylib
 *.a
+.DS_Store
 release/
 rtgui/rt
 rtgui/config.h

@@ -1,3 +1,4 @@
+#!/bin/sh
 rm CMakeCache.txt
 rm install_manifest.txt
 rm -R ./CMakeFiles 
