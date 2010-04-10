@@ -2,6 +2,13 @@ cmake_minimum_required(VERSION 2.6)
 
 set (CMAKE_BUILD_TYPE Debug CACHE STRING "One of: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 
+if (APPLE)
+    SET (CMAKE_OSX_ARCHITECTURES "i386;x86_64;" )
+    SET (CMAKE_TRY_COMPILE_OSX_ARCHITECTURES "i386;x86_64;" )
+    SET (CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.5.sdk")
+    SET (CMAKE_OSX_DEPLOYMENT_TARGET "10.5")
+endif (APPLE)
+
 option (BUILD_SHARED "Build rawtherapee with shared libraries" OFF)
 option (WITH_RAWZOR "Build with Rawzor support" ON)
 
