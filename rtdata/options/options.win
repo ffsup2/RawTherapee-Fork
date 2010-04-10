@@ -7,9 +7,9 @@ DateFormat=%y/%m/%d
 AdjusterDelay=0
 DualProcSupport=true
 MultiUser=true
-Language=english
-Theme=gray
-Version=231
+Language=English (US)
+Theme=Gray
+Version=300
 FirstRun=false
 
 [External Editor]
