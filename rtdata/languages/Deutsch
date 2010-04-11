@@ -336,6 +336,8 @@ PREFERENCES_CLIPPINGIND;Anzeige zu helle/zu dunkle Bereiche
 PREFERENCES_CMETRICINTENT;Farbraumtransformation
 PREFERENCES_DATEFORMAT;Datumsformat
 PREFERENCES_DATEFORMATHINT;<i>Die folgenden Variablen können verwendet werden:</i>\n<b>%y</b><i> : Jahr</i>\n<b>%m</b><i> : Monat</i>\n<b>%d</b><i> : Tag</i>\n<i>\nDas Deutsche Datumsformat zum Beispiel ist:</i>\n<b>%d/%m/%y</b>
+PREFERENCES_DCBITERATIONS;Anzahl der DCB Iterationen
+PREFERENCES_DCBENHANCE;DCB Verfeinerungsschritt durchführen
 PREFERENCES_DEFAULTLANG;Sprache für die Menüs und Dialoge
 PREFERENCES_DEFAULTTHEME;Standard Oberflächendesign
 PREFERENCES_DEMOSAICINGALGO;Algorithmus zur Entrasterung

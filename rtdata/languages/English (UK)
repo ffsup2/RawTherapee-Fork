@@ -1,5 +1,5 @@
-#
-#
+﻿#  British english
+# 16.01.2009: Richard Regal
 #
 ADJUSTER_RESET_TO_DEFAULT;Reset to default
 CURVEEDITOR_FILEDLGFILTERANY;Any files
@@ -132,23 +132,23 @@ HISTORY_MSG_30;Deconvolution Radius
 HISTORY_MSG_31;Deconvolution Amount
 HISTORY_MSG_32;Deconvolution Damping
 HISTORY_MSG_33;Deconvolution Iterations
-HISTORY_MSG_34;Avoid Color Clipping
+HISTORY_MSG_34;Avoid Colour Clipping
 HISTORY_MSG_35;Saturation Limiter
 HISTORY_MSG_36;Saturation Limit
-HISTORY_MSG_37;Color Boost
+HISTORY_MSG_37;Colour Boost
 HISTORY_MSG_38;White Balance Method
-HISTORY_MSG_39;Color Temperature
+HISTORY_MSG_39;Colour Temperature
 HISTORY_MSG_3;Profile Changed
 HISTORY_MSG_40;White Balance Tint
-HISTORY_MSG_41;Color Shift "A"
-HISTORY_MSG_42;Color Shift "B"
+HISTORY_MSG_41;Colour Shift "A"
+HISTORY_MSG_42;Colour Shift "B"
 HISTORY_MSG_43;Luminance Denoising
 HISTORY_MSG_44;Lum. Denoising Radius
 HISTORY_MSG_45;Lum. Denoising Edge Tolerance
-HISTORY_MSG_46;Color Denoising
-HISTORY_MSG_47;Color Denoising Radius
-HISTORY_MSG_48;Color Denoising Edge Tolerance
-HISTORY_MSG_49;Edge Sensitive Color Denoising
+HISTORY_MSG_46;Colour Denoising
+HISTORY_MSG_47;Colour Denoising Radius
+HISTORY_MSG_48;Colour Denoising Edge Tolerance
+HISTORY_MSG_49;Edge Sensitive Colour Denoising
 HISTORY_MSG_4;History Browsing
 HISTORY_MSG_50;Shadow/Highlight tool
 HISTORY_MSG_51;Highlight boost
@@ -170,10 +170,10 @@ HISTORY_MSG_65;C/A Correction
 HISTORY_MSG_66;Highlight Recovery
 HISTORY_MSG_67;Highlight Recovery Amount
 HISTORY_MSG_68;Highlight Recovery Method
-HISTORY_MSG_69;Working Color Space
+HISTORY_MSG_69;Working Colour Space
 HISTORY_MSG_6;Contrast
-HISTORY_MSG_70;Output Color Space
-HISTORY_MSG_71;Input Color Space
+HISTORY_MSG_70;Output Colour Space
+HISTORY_MSG_71;Input Colour Space
 HISTORY_MSG_72;Vignetting Correction
 HISTORY_MSG_73;Channel Mixer
 HISTORY_MSG_74;Resize Scale
@@ -264,7 +264,7 @@ MAIN_MSG_EXITJOBSINQUEUEQUEST;Are you sure you want to exit? There are unprocess
 MAIN_MSG_JOBSINQUEUE;job(s) in the queue
 MAIN_MSG_QOVERWRITE;Do you want to overwrite it?
 MAIN_TAB_BASIC;Basic
-MAIN_TAB_COLOR;Color
+MAIN_TAB_COLOR;Colour
 MAIN_TAB_DETAIL;Detail
 MAIN_TAB_EXIF;Exif
 MAIN_TAB_EXPOSURE;Exposure
@@ -283,11 +283,11 @@ MAIN_TOOLTIP_SAVEAS;Save image to a selected folder
 PARTIALPASTE_BASICGROUP;Basic settings
 PARTIALPASTE_CACORRECTION;C/A correction
 PARTIALPASTE_COARSETRANS;90 deg rotation / flipping
-PARTIALPASTE_COLORBOOST;Color boost
-PARTIALPASTE_COLORDENOISE;Color denoise
-PARTIALPASTE_COLORGROUP;Color related settings
-PARTIALPASTE_COLORMIXER;Color mixer
-PARTIALPASTE_COLORSHIFT;Color shift
+PARTIALPASTE_COLORBOOST;Colour boost
+PARTIALPASTE_COLORDENOISE;Colour denoise
+PARTIALPASTE_COLORGROUP;Colour related settings
+PARTIALPASTE_COLORMIXER;Colour mixer
+PARTIALPASTE_COLORSHIFT;Colour shift
 PARTIALPASTE_COMPOSITIONGROUP;Composition settings
 PARTIALPASTE_CROP;Crop
 PARTIALPASTE_DIALOGLABEL;Partial paste processing profile
@@ -329,6 +329,8 @@ PREFERENCES_CLIPPINGIND;Clipping indication
 PREFERENCES_CMETRICINTENT;Colorimetric Intent
 PREFERENCES_DATEFORMAT;Date Format
 PREFERENCES_DATEFORMATHINT;<i>You can use the following formatting strings:</i>\n<b>%y</b><i> : year</i>\n<b>%m</b><i> : month</i>\n<b>%d</b><i> : day</i>\n<i>\nFor example, the hungarian date format is:</i>\n<b>%y/%m/%d</b>
+PREFERENCES_DCBITERATIONS;Number of DCB iterations
+PREFERENCES_DCBENHANCE;Apply DCB enhancment step
 PREFERENCES_DEFAULTLANG;Default language
 PREFERENCES_DEFAULTTHEME;Default theme
 PREFERENCES_DEMOSAICINGALGO;Demosaicing Algorithm
@@ -340,7 +342,7 @@ PREFERENCES_DIRSOFTWARE;Installation directory
 PREFERENCES_DMETHOD;Method
 PREFERENCES_EDITORCMDLINE;Other command line
 PREFERENCES_EXTERNALEDITOR;External editor
-PREFERENCES_FALSECOLOR;False color surpression steps
+PREFERENCES_FALSECOLOR;False colour surpression steps
 PREFERENCES_FBROWSEROPTS;File Browser Options
 PREFERENCES_FILEFORMAT;File Format
 PREFERENCES_FORIMAGE;For image files
@@ -384,7 +386,7 @@ PREFERENCES_SHOWONLYRAW;Show only RAW files
 PREFERENCES_SHTHRESHOLD;Threshold for clipped shadows
 PREFERENCES_STARTUPIMDIR;Image directory at startup
 PREFERENCES_TAB_BROWSER;File Browser
-PREFERENCES_TAB_COLORMGR;Color Management
+PREFERENCES_TAB_COLORMGR;Colour Management
 PREFERENCES_TAB_GENERAL;General
 PREFERENCES_TAB_IMPROC;Image Processing
 PREFERENCES_TAB_OUTPUT;Output Options
@@ -450,21 +452,21 @@ TP_COARSETRAF_TOOLTIP_ROTRIGHT;Rotate right
 TP_COARSETRAF_TOOLTIP_VFLIP;Flip vertically
 TP_COLORBOOST_ACHANNEL;Channel "a"
 TP_COLORBOOST_AMOUNT;Amount
-TP_COLORBOOST_AVOIDCOLORCLIP;Avoid color clipping
+TP_COLORBOOST_AVOIDCOLORCLIP;Avoid colour clipping
 TP_COLORBOOST_BCHANNEL;Channel "b"
 TP_COLORBOOST_CHAB;a & b
 TP_COLORBOOST_CHANNEL;Channel
 TP_COLORBOOST_CHSEPARATE;separate
 TP_COLORBOOST_ENABLESATLIMITER;Enable saturation limiter
-TP_COLORBOOST_LABEL;Color Boost
+TP_COLORBOOST_LABEL;Colour Boost
 TP_COLORBOOST_SATLIMIT;Saturation limit
 TP_COLORDENOISE_EDGESENSITIVE;Edge Sensitive
 TP_COLORDENOISE_EDGETOLERANCE;Edge Tolerance
-TP_COLORDENOISE_LABEL;Color Noise Reduction
+TP_COLORDENOISE_LABEL;Colour Noise Reduction
 TP_COLORDENOISE_RADIUS;Radius
 TP_COLORSHIFT_BLUEYELLOW;Blue-Yellow
 TP_COLORSHIFT_GREENMAGENTA;Green-Magenta
-TP_COLORSHIFT_LABEL;Color Shift
+TP_COLORSHIFT_LABEL;Colour Shift
 TP_CROP_DPI;DPI=
 TP_CROP_FIXRATIO;Fix Ratio:
 TP_CROP_GTDIAGONALS;Rule of diagonals
@@ -494,7 +496,7 @@ TP_EXPOSURE_CURVEEDITOR;Tone Curve
 TP_EXPOSURE_EXPCOMP;Exp. Comp.
 TP_EXPOSURE_LABEL;Exposure
 TP_HLREC_CIELAB;CIELab Blending
-TP_HLREC_COLOR;Color Propagation
+TP_HLREC_COLOR;Colour Propagation
 TP_HLREC_LABEL;Highlight Recovery
 TP_HLREC_LUMINANCE;Luminance Recovery
 TP_HLREC_METHOD;Method: 

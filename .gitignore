@@ -9,3 +9,8 @@ install_manifest.txt
 *.dylib
 *.a
 *.rej
+.DS_Store
+release/
+rtgui/rt
+rtgui/rt.exe
+rtgui/config.h

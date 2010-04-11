@@ -5,7 +5,7 @@
 
 style "theme-default" {
 
-    font_name = "tahoma 8"
+    font_name = "tahoma 12"
 
     GtkButton      ::default_border    = { 0, 0, 0, 0 }
     GtkRange       ::trough_border     = 1

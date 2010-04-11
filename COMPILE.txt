@@ -36,3 +36,22 @@ anywhere you want)
 ...If you have problems with the compilation, identified the reason and fixed 
 the bug, please send me the updated build scripts (CMakeLists.txt files) to:
 hgabor@rawtherapee.com
+
+OSX
+---
+
+Requirements:
+- MacPorts
+  - Set /opt/local/etc/macports/variants.conf to include "+universal +no_x11 +quartz"  (NOTE: as of this writing the Pango and Pango-devel ports are broken and will not build as Universal variants.  Until this is fixed, leave the universal flag off.)
+  - Set /opt/local/etc/macports/macports.conf key 'universal_archs' to "i386 x86_64"
+  - Run "sudo port install cairomm pango-devel gtk2 cmake glibmm gtkmm lcms libiptcdata" to install all needed libraries
+- XCode Development Tools (you only need a subset of these, but it is probably easier to just install all of them)
+
+Compile:
+- Enter root directory of RawTherapee source tree
+- Type: cmake .
+- Type: make install
+- Type: ./tools/osx/make-app-bundle
+- You will find a RawTherapee.dmg file in release/ folder; this is the distribution release and can be run on any 10.5 or 10.6 Intel machine.
+
+For any bugs or patches to the OSX build, please contact Wyatt <wyatt@digitalcave.ca>

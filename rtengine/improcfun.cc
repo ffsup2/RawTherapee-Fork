@@ -169,7 +169,7 @@ void ImProcFunctions::initCache () {
     for (int i=0; i<369620; i++)
         xcache[i] = CLIP(xcache[i]);
     zcache = new int[825747];
-    for (int i=-369619; i<456127; i++)
+    for (int i=-369619; i<456128; i++)
         zcache[i+369619] = (int)round(65536.0 * (i > 15728 ? ((double)i/76021)*((double)i/76021)*((double)i/76021)*0.82521 : (1.2841854934601665e-1*(double)i/76021-1.7712903358071262e-2)*0.82521));
     for (int i=0; i<825747; i++)
         zcache[i] = CLIP(zcache[i]);
@@ -988,18 +988,24 @@ void ImProcFunctions::transform_ (Image16* original, Image16* transformed, const
     double b = 1.0 + params->vignetting.radius * 7.0 / 100.0;
   
     double mul = (1.0-v) / tanh(b);
-
     // main cycle
     double eps = 1e-10;
+    bool calc_r=( (fabs(a)>eps) || (fabs(1.0-v)>eps) );
+    bool do_vign = (fabs(1.0-v)>eps);
+
     for (int y=row_from; y<row_to; y++) {
         double y_d = (double) (y + cy) - h2 ;
         for (int x=0; x<transformed->width; x++) {
             double x_d = (double) (x + cx) - w2 ;
 
-            double r = (sqrt(x_d*x_d + y_d*y_d)) / scale;
-            double s = 10000.0;
-            if (r<radius)	
-	            s = a * r + d;
+            double r=0.0;
+            double s = d;//10000.0;
+	    if (calc_r)
+	    {
+	            r=(sqrt(x_d*x_d + y_d*y_d)) / scale;
+	            if (r<radius)	
+	            s += a * r ;
+	    }
 
             double Dx = s*(x_d * cost - y_d * sint) + w2;
             double Dy = s*(x_d * sint + y_d * cost) + h2;
@@ -1019,7 +1025,8 @@ void ImProcFunctions::transform_ (Image16* original, Image16* transformed, const
                 int ys = yc +1 - n2 - sy; // smallest y-index used for interpolation
                 int xs = xc +1 - n2 - sx; // smallest x-index used for interpolation
 
-                double vignmul = 1.0 / (v + mul * tanh (b*(maxRadius-s*r) / maxRadius));
+                double vignmul = 1.0;
+		if (do_vign) vignmul /= (v + mul * tanh (b*(maxRadius-s*r) / maxRadius));
 
                 if (ys >= 0 && ys <= miy2 && xs >= 0 && xs <= mix2)   // all interpolation pixels inside image
                     cubint (original, xs, ys, Dx, Dy, &(transformed->r[y][x]), &(transformed->g[y][x]), &(transformed->b[y][x]), vignmul); 
@@ -1085,7 +1092,8 @@ void ImProcFunctions::simpltransform_ (Image16* original, Image16* transformed, 
   double a = params->distortion.amount;
   
   double d = 1.0 - a;
-  
+
+ 
     // magnify image to keep size
     double rotmagn = 1.0;
     if (params->rotate.fill) {
@@ -1118,15 +1126,22 @@ void ImProcFunctions::simpltransform_ (Image16* original, Image16* transformed, 
 
     // main cycle
     double eps = 1e-10;
+    bool calc_r=( (fabs(a)>eps) || (fabs(1.0-v)>eps) );
+    bool do_vign = (fabs(1.0-v)>eps);
+ 
     for (int y=row_from; y<row_to; y++) {
         double y_d = (double) (y + cy) - h2 ;
         for (int x=0; x<transformed->width; x++) {
             double x_d = (double) (x + cx) - w2 ;
 
-            double r = (sqrt(x_d*x_d + y_d*y_d)) / scale;
-            double s = 10000.0;
-            if (r<radius)	
-	            s = a * r + d;
+            double r=0.0;
+            double s = d;//10000.0;
+	    if (calc_r)
+	    {
+	            r=(sqrt(x_d*x_d + y_d*y_d)) / scale;
+	            if (r<radius)	
+	            s += a * r ;
+	    }
 
             double Dx = s*(x_d * cost - y_d * sint) + w2;
             double Dy = s*(x_d * sint + y_d * cost) + h2;
@@ -1146,7 +1161,8 @@ void ImProcFunctions::simpltransform_ (Image16* original, Image16* transformed, 
                 int ys = yc +1 - n2 - sy; // smallest y-index used for interpolation
                 int xs = xc +1 - n2 - sx; // smallest x-index used for interpolation
 
-                double vignmul = 1.0 / (v + mul * tanh (b*(maxRadius-s*r) / maxRadius));
+                double vignmul = 1.0;
+		if (do_vign) vignmul /= (v + mul * tanh (b*(maxRadius-s*r) / maxRadius));
 
                 if (ys >= 0 && ys <= miy2 && xs >= 0 && xs <= mix2 && yc < miy-1) {   // all interpolation pixels inside image
 
@@ -1331,7 +1347,7 @@ bool ImProcFunctions::transCoord (const ProcParams* params, int W, int H, std::v
     red.clear ();
     green.clear ();
     blue.clear ();
-    bool needstransform  = fabs(params->rotate.degree)>1e-15 || fabs(params->distortion.amount)>1e-15 || fabs(params->cacorrection.red)>1e-15 || fabs(params->cacorrection.blue)>1e-15;
+    bool needstransform  = 0;//fabs(params->rotate.degree)>1e-15 || fabs(params->distortion.amount)>1e-15 || fabs(params->cacorrection.red)>1e-15 || fabs(params->cacorrection.blue)>1e-15;
     if (!needstransform) {
         if (clipresize) {
             // Apply resizing
@@ -1518,12 +1534,12 @@ bool ImProcFunctions::transCoord (const ProcParams* params, int W, int H, int x,
 void ImProcFunctions::transform (Image16* original, Image16* transformed, const ProcParams* params, int cx, int cy, int sx, int sy, int oW, int oH) {
 
     STemp sizes;
-    sizes.cx = cx;
-    sizes.cy = cy;
+    sizes.cx = 0;//cx;
+    sizes.cy = 0;//cy;
     sizes.oW = oW;
     sizes.oH = oH;
-    sizes.sx = sx;
-    sizes.sy = sy;
+    sizes.sx = 0;//sx;
+    sizes.sy = 0;//sy;
     
     if (params->cacorrection.red==0 && params->cacorrection.blue==0) {
         if (settings->dualThreadEnabled) {
@@ -1550,12 +1566,12 @@ void ImProcFunctions::transform (Image16* original, Image16* transformed, const 
 void ImProcFunctions::simpltransform (Image16* original, Image16* transformed, const ProcParams* params, int cx, int cy, int sx, int sy, int oW, int oH) {
 
     STemp sizes;
-    sizes.cx = cx;
-    sizes.cy = cy;
+    sizes.cx = 0;//cx;
+    sizes.cy = 0;//cy;
     sizes.oW = oW;
     sizes.oH = oH;
-    sizes.sx = sx;
-    sizes.sy = sy;
+    sizes.sx = 0;//sx;
+    sizes.sy = 0;//sy;
     
     if (settings->dualThreadEnabled) {
         Glib::Thread *thread1 = Glib::Thread::create(sigc::bind(sigc::mem_fun(*this, &ImProcFunctions::simpltransform_), original, transformed, params, sizes, 0, transformed->height/2), 0, true, true, Glib::THREAD_PRIORITY_NORMAL);
@@ -1910,6 +1926,178 @@ void ImProcFunctions::resize (Image16* src, Image16* dst, ResizeParams params) {
 }
 
 void ImProcFunctions::resize_ (Image16* src, Image16* dst, ResizeParams params, int row_from, int row_to) {
+
+    if(params.method == "Downscale (Better)")
+	{
+        // small-scale algorithm by Ilia
+        // provides much better quality on small scales
+        // calculates mean value over source pixels which current destination pixel covers
+        // works only for scales < 1
+        // for scales ~1 it is analogous to bilinear
+        // possibly, for even less scale factors (< 0.2 possibly) boundary pixels are not needed, omitting them can give a speedup
+        // this algorithm is much slower on small factors than others, because it uses all pixels of the SOURCE image
+        // Ilia Popov ilia_popov@rambler.ru 2010
+	
+        double delta = 1.0 / params.scale;
+        double k = params.scale * params.scale;
+
+        for(int i = row_from; i < row_to; i++)
+        {
+            // top and bottom boundary coordinates
+            double y0 = i * delta;
+            double y1 = (i + 1) * delta;
+
+            int m0 = y0;
+            m0 = CLIPTO(m0, 0, src->height-1);
+
+            int m1 = y1;
+            m1 = CLIPTO(m1, 0, src->height-1);
+
+            // weights of boundary pixels
+            double wy0 = 1.0 - (y0 - m0);
+            double wy1 = y1 - m1;
+
+            for(int j = 0; j < dst->width; j++)
+            {
+                // left and right boundary coordinates
+                double x0 = j * delta;
+                double x1 = (j + 1) * delta;
+
+                int n0 = x0;
+                n0 = CLIPTO(n0, 0, src->width-1);
+                int n1 = x1;
+                n1 = CLIPTO(n1, 0, src->width-1);
+
+                double wx0 = 1.0 - (x0 - n0);
+                double wx1 = x1 - n1;
+
+                double r = 0;
+                double g = 0;
+                double b = 0;
+
+                // integration
+                // corners
+                r += wy0 * wx0 * src->r[m0][n0] + wy0 * wx1 * src->r[m0][n1] + wy1 * wx0 * src->r[m1][n0] + wy1 * wx1 * src->r[m1][n1]; 
+                g += wy0 * wx0 * src->g[m0][n0] + wy0 * wx1 * src->g[m0][n1] + wy1 * wx0 * src->g[m1][n0] + wy1 * wx1 * src->g[m1][n1]; 
+                b += wy0 * wx0 * src->b[m0][n0] + wy0 * wx1 * src->b[m0][n1] + wy1 * wx0 * src->b[m1][n0] + wy1 * wx1 * src->b[m1][n1]; 
+
+                // top and bottom boundaries
+                for(int n = n0 + 1; n < n1; n++)
+                {
+                    r += wy0 * src->r[m0][n] + wy1 * src->r[m1][n];
+                    g += wy0 * src->g[m0][n] + wy1 * src->g[m1][n];
+                    b += wy0 * src->b[m0][n] + wy1 * src->b[m1][n];
+                }
+
+                // inner rows
+                for(int m = m0 + 1; m < m1; m++)
+                {
+                    // left and right boundaries
+                    r += wx0 * src->r[m][n0] + wx1 * src->r[m][n1];
+                    g += wx0 * src->g[m][n0] + wx1 * src->g[m][n1];
+                    b += wx0 * src->b[m][n0] + wx1 * src->b[m][n1];
+                    // inner pixels
+                    for(int n = n0 + 1; n < n1; n++)
+                    {
+                        r += src->r[m][n];
+                        g += src->g[m][n];
+                        b += src->b[m][n];
+                    }
+                }
+	        
+                // overall weight is equal to the DST pixel area in SRC coordinates
+                r *= k;
+                g *= k;
+                b *= k;
+                
+                dst->r[i][j] = CLIP((int)r);
+                dst->g[i][j] = CLIP((int)g);
+                dst->b[i][j] = CLIP((int)b);
+            }
+        }
+        
+        return;
+    }
+    
+    if(params.method == "Downscale (Faster)")
+	{
+        // faster version of algo above, does not take into account border pixels,
+        // which are summed with non-unity weights in slow algo. So, no need
+        // for weights at all
+        // Ilia Popov ilia_popov@rambler.ru 5.04.2010
+
+        double delta = 1.0 / params.scale;
+        
+        int p = (int) delta;
+        
+        // if actually we are doing upscaling, behave like Nearest
+        if(p == 0)
+            p = 1;
+            
+        int q = p/2;
+        
+        // may cause problems on 32-bit systems on extremely small factors.
+        // In that case change 1024 to smth less
+        const int divider = 1024;
+        
+        // scaling factor after summation
+        int k = divider / (p * p); 
+
+        for(int i = row_from; i < row_to; i++)
+        {
+            // y coordinate of center of destination pixel
+            double y = (i + 0.5) * delta;
+
+            int m0 = (int) (y) - q;
+            m0 = CLIPTO(m0, 0, src->height-1);
+
+            int m1 = m0 + p;
+            if(m1 > src->height)
+            {
+                m1 = src->height;
+                m0 = m1 - p;
+            }
+            m1 = CLIPTO(m1, 0, src->height);
+
+            for(int j = 0; j < dst->width; j++)
+            {
+                // x coordinate of center of destination pixel
+                double x = (j + 0.5) * delta;
+
+                int n0 = (int) (x) - q;
+                n0 = CLIPTO(n0, 0, src->width-1);
+
+                int n1 = n0 + p;
+                if(n1 > src->width)
+                {
+                    n1 = src->width;
+                    n0 = n1 - p;
+                }
+                n1 = CLIPTO(n1, 0, src->width);
+
+                int r = 0;
+                int g = 0;
+                int b = 0;
+
+                // integration
+                for(int m = m0; m < m1; m++)
+                {
+                    for(int n = n0; n < n1; n++)
+                    {
+                        r += src->r[m][n];
+                        g += src->g[m][n];
+                        b += src->b[m][n];
+                    }
+                }
+	        
+                dst->r[i][j] = CLIP( r * k / divider);
+                dst->g[i][j] = CLIP( g * k / divider);
+                dst->b[i][j] = CLIP( b * k / divider);
+            }
+        }
+        return;
+    }
+    
 
     if (params.method.substr(0,7)=="Bicubic") {
         double Av = -0.5;

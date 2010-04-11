@@ -259,6 +259,9 @@ Gtk::Widget* Preferences::getProcParamsPanel () {
     dmethod->append_text ("EAHD");
     dmethod->append_text ("HPHD");
     dmethod->append_text ("VNG-4");
+    dmethod->append_text ("PPG");
+    dmethod->append_text ("DCB");
+    dmethod->append_text ("AHD");
     Gtk::Label* cclab = Gtk::manage (new Gtk::Label (M("PREFERENCES_FALSECOLOR")+":"));
     ccSteps = Gtk::manage (new Gtk::SpinButton ());
     ccSteps->set_digits (0);
@@ -267,8 +270,22 @@ Gtk::Widget* Preferences::getProcParamsPanel () {
     Gtk::HBox* hb12 = Gtk::manage (new Gtk::HBox ());
     hb12->pack_start (*cclab, Gtk::PACK_SHRINK, 4);
     hb12->pack_start (*ccSteps);
+
+    dcbIterationsLabel = Gtk::manage(new Gtk::Label(M("PREFERENCES_DCBITERATIONS")+":"));
+    dcbIterations = Gtk::manage(new Gtk::SpinButton ());
+    dcbIterations->set_digits(0);
+    dcbIterations->set_increments(1, 2);
+    dcbIterations->set_range(0, 10);
+    Gtk::HBox* hb13 = Gtk::manage(new Gtk::HBox());
+    hb13->pack_start (*dcbIterationsLabel, Gtk::PACK_SHRINK, 4);
+    hb13->pack_start (*dcbIterations);
+
+    dcbEnhance = Gtk::manage(new Gtk::CheckButton((M("PREFERENCES_DCBENHANCE"))));
+
     fdb->pack_start (*hb11, Gtk::PACK_SHRINK, 4);
     fdb->pack_start (*hb12, Gtk::PACK_SHRINK, 4);
+    fdb->pack_start (*hb13, Gtk::PACK_SHRINK, 4);
+    fdb->pack_start (*dcbEnhance, Gtk::PACK_SHRINK, 4);
     mvbpp->pack_start (*fdem, Gtk::PACK_SHRINK, 4);
     mvbpp->set_border_width (4);
     //  drlab->set_size_request (drimg->get_width(), -1);
@@ -686,6 +703,14 @@ void Preferences::storePreferences () {
         moptions.rtSettings.demosaicMethod = "hphd";
     else if (dmethod->get_active_row_number()==2)
         moptions.rtSettings.demosaicMethod = "vng4";
+    else if (dmethod->get_active_row_number()==3)
+        moptions.rtSettings.demosaicMethod = "ppg";
+    else if (dmethod->get_active_row_number()==4)
+        moptions.rtSettings.demosaicMethod = "dcb";
+    else if (dmethod->get_active_row_number()==5)
+        moptions.rtSettings.demosaicMethod = "ahd";
+    moptions.rtSettings.dcb_iterations=(int)dcbIterations->get_value();
+    moptions.rtSettings.dcb_enhance=dcbEnhance->get_active();
 
     if (sdcurrent->get_active ()) 
         moptions.startupDir = STARTUPDIR_CURRENT;
@@ -771,6 +796,17 @@ void Preferences::fillPreferences () {
         dmethod->set_active (1);
     else if (moptions.rtSettings.demosaicMethod=="vng4")
         dmethod->set_active (2);
+    else if (moptions.rtSettings.demosaicMethod=="ppg")
+        dmethod->set_active (3);
+    else if (moptions.rtSettings.demosaicMethod=="dcb")
+        dmethod->set_active (4);
+    else if (moptions.rtSettings.demosaicMethod=="ahd")
+        dmethod->set_active (5);
+    dcbEnhance->set_active(moptions.rtSettings.dcb_enhance);
+    dcbIterations->set_value(moptions.rtSettings.dcb_iterations);
+    dcbEnhance->set_sensitive(moptions.rtSettings.demosaicMethod=="dcb");
+    dcbIterations->set_sensitive(moptions.rtSettings.demosaicMethod=="dcb");
+    dcbIterationsLabel->set_sensitive(moptions.rtSettings.demosaicMethod=="dcb");
 
     if (moptions.startupDir==STARTUPDIR_CURRENT) 
         sdcurrent->set_active ();
@@ -869,6 +905,16 @@ void Preferences::dmethodChanged () {
         ccSteps->set_value (1);
     else if (dmethod->get_active_row_number()==2)
         ccSteps->set_value (2);
+
+    if (dmethod->get_active_row_number()==4) {
+        dcbEnhance->set_sensitive(true);
+        dcbIterations->set_sensitive(true);
+        dcbIterationsLabel->set_sensitive(true);
+    } else {
+        dcbEnhance->set_sensitive(false);
+        dcbIterations->set_sensitive(false);
+        dcbIterationsLabel->set_sensitive(false);
+    }
 }
 
 void Preferences::aboutPressed () {

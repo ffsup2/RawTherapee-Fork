@@ -7,16 +7,16 @@ DateFormat=%y/%m/%d
 AdjusterDelay=0
 DualProcSupport=true
 MultiUser=true
-Language=english
-Theme=gray
-Version=231
+Language=English (US)
+Theme=Gray
+Version=300
 FirstRun=false
 
 [External Editor]
 EditorKind=1
-GimpDir=
-PhotoshopDir=
-CustomEditor=
+GimpDir=C:\\Program Files\\GIMP-2.0
+PhotoshopDir=C:\\Program Files\\Adobe\\Adobe Photoshop CS3
+CustomEditor=start
 
 [File Browser]
 BrowseOnlyRaw=false

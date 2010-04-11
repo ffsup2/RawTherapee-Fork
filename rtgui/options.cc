@@ -33,6 +33,8 @@ Options::Options () {
 
 void Options::setDefaults () {
 
+    windowWidth = 1000;
+    windowHeight = 600;
     firstRun = true;
     savesParamsAtExit = true;
     saveFormat.format = "jpg";
@@ -113,6 +115,8 @@ void Options::setDefaults () {
     rtSettings.dualThreadEnabled = true;
     rtSettings.demosaicMethod = "eahd";
     rtSettings.colorCorrectionSteps = 2;
+    rtSettings.dcb_iterations = 2;
+    rtSettings.dcb_enhance = true;
     rtSettings.iccDirectory = "/usr/share/color/icc";
     rtSettings.colorimetricIntent = 1;
     rtSettings.monitorProfile = "";
@@ -217,6 +221,8 @@ if (keyFile.has_group ("Clipping Indication")) {
 }
 
 if (keyFile.has_group ("GUI")) { 
+    if (keyFile.has_key ("GUI", "WindowWidth"))     windowWidth   = keyFile.get_integer ("GUI", "WindowWidth");
+    if (keyFile.has_key ("GUI", "WindowHeight"))     windowHeight   = keyFile.get_integer ("GUI", "WindowHeight");
     if (keyFile.has_key ("GUI", "DirBrowserWidth"))     dirBrowserWidth   = keyFile.get_integer ("GUI", "DirBrowserWidth");
     if (keyFile.has_key ("GUI", "DirBrowserHeight"))    dirBrowserHeight  = keyFile.get_integer ("GUI", "DirBrowserHeight");
     if (keyFile.has_key ("GUI", "ToolPanelWidth"))      toolPanelWidth    = keyFile.get_integer ("GUI", "ToolPanelWidth");
@@ -238,6 +244,8 @@ if (keyFile.has_group ("GUI")) {
 if (keyFile.has_group ("Algorithms")) { 
     if (keyFile.has_key ("Algorithms", "DemosaicMethod"))  rtSettings.demosaicMethod       = keyFile.get_string  ("Algorithms", "DemosaicMethod");
     if (keyFile.has_key ("Algorithms", "ColorCorrection")) rtSettings.colorCorrectionSteps = keyFile.get_integer ("Algorithms", "ColorCorrection");
+    if(keyFile.has_key("Algorithms", "DCBIterations")) rtSettings.dcb_iterations = keyFile.get_integer("Algorithms", "DCBIterations");
+    if(keyFile.has_key("Algorithms", "DCBEnhance")) rtSettings.dcb_enhance = keyFile.get_boolean("Algorithms", "DCBEnhance");
 }
 
 if (keyFile.has_group ("Crop Settings")) { 
@@ -336,6 +344,8 @@ int Options::saveToFile (Glib::ustring fname) {
     keyFile.set_boolean ("Profiles", "SaveParamsToCache", saveParamsCache);
     keyFile.set_integer ("Profiles", "LoadParamsFromLocation", paramsLoadLocation);
     
+    keyFile.set_integer ("GUI", "WindowWidth", windowWidth);
+    keyFile.set_integer ("GUI", "WindowHeight", windowHeight);
     keyFile.set_integer ("GUI", "DirBrowserWidth", dirBrowserWidth);
     keyFile.set_integer ("GUI", "DirBrowserHeight", dirBrowserHeight);
     keyFile.set_integer ("GUI", "ToolPanelWidth", toolPanelWidth);
@@ -357,6 +367,8 @@ int Options::saveToFile (Glib::ustring fname) {
 
     keyFile.set_string  ("Algorithms", "DemosaicMethod", rtSettings.demosaicMethod);
     keyFile.set_integer ("Algorithms", "ColorCorrection", rtSettings.colorCorrectionSteps);
+    keyFile.set_integer ("Algorithms", "DCBIterations", rtSettings.dcb_iterations);
+    keyFile.set_boolean ("Algorithms", "DCBEnhance", rtSettings.dcb_enhance);
     
     keyFile.set_integer ("Crop Settings", "DPI", cropDPI);
 
@@ -395,8 +407,9 @@ void Options::load () {
         }
         cacheBaseDir = rtdir + "/cache";
     }
-    if (!langMgr.load (argv0+"/languages/"+options.language, new MultiLangMgr (argv0+"/languages/english-us")))
-        langMgr.load (argv0+"/languages/english-us");
+
+    if (!langMgr.load (argv0+"/languages/"+options.language, new MultiLangMgr (argv0+"/languages/English (US)")))
+        langMgr.load (argv0+"/languages/English (US)");
 
     rtengine::init (&options.rtSettings);
 }
@@ -409,4 +422,11 @@ void Options::save () {
     else {
         options.saveToFile (rtdir + "/options");
     }
+}
+
+bool Options::is_extention_enabled (Glib::ustring ext) {
+		for (int j=0; j<parseExtensions.size(); j++)
+      if (parseExtensions[j].casefold() == ext.casefold())
+				return j>=parseExtensionsEnabled.size() || parseExtensionsEnabled[j];
+		return false;
 }

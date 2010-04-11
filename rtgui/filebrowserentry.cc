@@ -40,6 +40,8 @@ FileBrowserEntry::FileBrowserEntry (Thumbnail* thm, const Glib::ustring& fname)
     italicstyle = thumbnail->getType() != FT_Raw;
     datetimeline = thumbnail->getDateTimeString ();
     exifline = thumbnail->getExifString ();
+
+    scale = 1;
     
     if (!iconsLoaded) {
         editedIcon = Gdk::Pixbuf::create_from_file (argv0+"/images/edited.png");

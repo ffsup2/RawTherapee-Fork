@@ -258,7 +258,7 @@ void FileCatalog::dirSelected (const Glib::ustring& dirname, const Glib::ustring
 #ifdef _WIN32
       wdMonitor = new WinDirMonitor (selectedDirectory, this);
 #elif defined __APPLE__
-      printf("dir->monitor_directory () doesn't work for Mac OS X until now\n");
+      printf("TODO fix dir->monitor_directory () for OSX\n");
 #else  
         dirMonitor = dir->monitor_directory ();
         dirMonitor->signal_changed().connect (sigc::bind(sigc::mem_fun(*this, &FileCatalog::on_dir_changed), false));
@@ -708,15 +708,10 @@ void FileCatalog::checkAndAddFile (Glib::RefPtr<Gio::File> file) {
     Glib::RefPtr<Gio::FileInfo> info = file->query_info();
     if (info && info->get_file_type() != Gio::FILE_TYPE_DIRECTORY && (!info->is_hidden() || !options.fbShowHidden)) {
         int lastdot = info->get_name().find_last_of ('.');
-        Glib::ustring ext = lastdot!=Glib::ustring::npos ? info->get_name().substr (lastdot+1) : "";
-        // look up if it is supported
-        for (int j=0; j<options.parseExtensions.size(); j++)
-            // if supported, add it to the loader queue
-            if (options.parseExtensions[j].casefold() == ext.casefold() && options.parseExtensionsEnabled[j]) {
-                previewLoader.add (DirEntry (file->get_parse_name()));
-                previewsToLoad++;
-                break;
-            }
+        if (options.is_extention_enabled(lastdot!=Glib::ustring::npos ? info->get_name().substr (lastdot+1) : "")){
+						previewLoader.add (DirEntry (file->get_parse_name()));
+            previewsToLoad++;
+				}
     }
 }
 
@@ -727,24 +722,20 @@ void FileCatalog::addAndOpenFile (const Glib::ustring& fname) {
         return;
     Glib::RefPtr<Gio::FileInfo> info = file->query_info();
     int lastdot = info->get_name().find_last_of ('.');
-    Glib::ustring ext = lastdot!=Glib::ustring::npos ? info->get_name().substr (lastdot+1) : "";
-    // look up if it is supported
-    for (int j=0; j<options.parseExtensions.size(); j++)
-        if (options.parseExtensions[j].casefold() == ext.casefold() && options.parseExtensionsEnabled[j]) {
-            // if supported, load thumbnail first
-            Thumbnail* tmb = cacheMgr.getEntry (file->get_parse_name());
-            if (tmb) {
-                FileBrowserEntry* entry = new FileBrowserEntry (tmb, file->get_parse_name());
-      	        previewReady (entry);
-                // open the file
-                FCOIParams* params = new FCOIParams;
-                params->catalog = this;
-                params->tmb.push_back (tmb);
-                tmb->increaseRef ();
-                g_idle_add (fcopenimg, params);
-            }
-            break;
+    if (options.is_extention_enabled(lastdot!=Glib::ustring::npos ? info->get_name().substr (lastdot+1) : "")){
+        // if supported, load thumbnail first
+        Thumbnail* tmb = cacheMgr.getEntry (file->get_parse_name());
+        if (tmb) {
+            FileBrowserEntry* entry = new FileBrowserEntry (tmb, file->get_parse_name());
+  	        previewReady (entry);
+            // open the file
+            FCOIParams* params = new FCOIParams;
+            params->catalog = this;
+            params->tmb.push_back (tmb);
+            tmb->increaseRef ();
+            g_idle_add (fcopenimg, params);
         }
+    }
 }
 
 void FileCatalog::emptyTrash () {

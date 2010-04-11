@@ -31,7 +31,7 @@ RTWindow::RTWindow () {
     catch (Glib::FileError) {}
     set_title("Raw Therapee "+versionString);
     property_allow_shrink() = true;
-	set_size_request (1000,600);
+	set_size_request (options.windowWidth, options.windowHeight);
 //    maximize ();
     set_modal(false);
     set_resizable(true);
@@ -179,8 +179,8 @@ bool RTWindow::on_delete_event(GdkEventAny* event) {
 
     fpanel->saveOptions ();
     bpanel->saveOptions ();
-
-/*    if (fileBrowser->getFileCatalog()->getBatchQueue()->hasJobs()) {
+/*
+    if (fileBrowser->getFileCatalog()->getBatchQueue()->hasJobs()) {
         Gtk::MessageDialog msgd (M("MAIN_MSG_EXITJOBSINQUEUEQUEST"), false, Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_YES_NO, true);
         msgd.set_secondary_text (M("MAIN_MSG_EXITJOBSINQUEUEINFO"));
         int response = msgd.run ();
@@ -194,7 +194,7 @@ bool RTWindow::on_delete_event(GdkEventAny* event) {
         options.startupPath = fileBrowser->lastSelectedDir ();
     fileBrowser->close ();
     cacheMgr.closeCache ();
-        
+      
     options.lastScale = editorPanel->zoomBar->getScale ();
     options.lastCropSize = editorPanel->zoomBar->getCropSize ();
     if (options.showFilePanelState==0 || options.showFilePanelState==2)
@@ -211,6 +211,10 @@ bool RTWindow::on_delete_event(GdkEventAny* event) {
     options.fbArrangement = fileBrowser->getFileCatalog()->getArrangement ();
     options.firstRun = false;
 */
+    options.windowWidth = get_width();
+    options.windowHeight = get_height();
+   
+
     Options::save ();
     hide();
     return true;
