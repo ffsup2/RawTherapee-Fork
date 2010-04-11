@@ -1926,71 +1926,9 @@ void ImProcFunctions::resize (Image16* src, Image16* dst, ResizeParams params) {
 }
 
 void ImProcFunctions::resize_ (Image16* src, Image16* dst, ResizeParams params, int row_from, int row_to) {
-    if ((params.scale > 0.499)&&(params.scale< 0.501))
-	{
-	// fast 50% reduction by Jan Rinze Peterzon
-	for(int j = row_from; j < row_to; j++)
-	 for(int i = 0, y=CLIPTO(j*2, 0, src->height-2); i<dst->width ; i++)
-	   {
-		int x = i*2;
-		x=CLIPTO(x, 0, src->width-2);
-		unsigned int r = (src->r[y][x]+src->r[y+1][x]+src->r[y][x+1]+src->r[y+1][x+1])>>2;
-		unsigned int g = (src->g[y][x]+src->g[y+1][x]+src->g[y][x+1]+src->g[y+1][x+1])>>2;
-		unsigned int b = (src->b[y][x]+src->b[y+1][x]+src->b[y][x+1]+src->b[y+1][x+1])>>2;
-		dst->r[j][i]=r;
-		dst->g[j][i]=g;
-		dst->b[j][i]=b;
-	   }
-	return;
-	}
-     if ((params.scale > 0.249)&&(params.scale< 0.251))
-	{
-	// fast 25% reduction by Jan Rinze Peterzon
-	for(int j = row_from; j < row_to; j++)
-	 for(int i = 0, y=CLIPTO(j*4, 0, src->height-4); i<dst->width ; i++)
-	   {
-		int x = i*4;// , y=j*4;
-		unsigned int r=0,g=0,b=0;
-		x=CLIPTO(x, 0, src->width-4);
-		for (int k=y;k<(y+4);k++)
-		  for (int l=x;l<(x+4);l++)
-		    {
-			r += src->r[k][l];
-			g += src->g[k][l];
-			b += src->b[k][l];
-		    }
-		dst->r[j][i]=r>>4;
-		dst->g[j][i]=g>>4;
-		dst->b[j][i]=b>>4;
 
-	   }
-	return;
-	}           
-     if ((params.scale > 0.329)&&(params.scale< 0.334))
+    if(params.method == "Downscale (Better)")
 	{
-	// fast 33% reduction by Jan Rinze Peterzon
-	unsigned int one_third = (1<<14)/3;
-	for(int j = row_from; j < row_to; j++)
-	  for(int i = 0,y=CLIPTO((j*3), 0, src->height-3); i<dst->width ; i++)
-	  {
-	     int x = i*3 ;
-	     unsigned int r=0,g=0,b=0;
-	     x=CLIPTO(x, 0, src->width-3);
-	     for (int k=y;k<(y+3);k++)
-		for (int l=x;l<(x+3);l++)
-		{
-		   r += src->r[k][l];
-		   g += src->g[k][l];
-		   b += src->b[k][l];
-		}
-	     dst->r[j][i]=(r*one_third)>>14;
-	     dst->g[j][i]=(g*one_third)>>14;
-	     dst->b[j][i]=(b*one_third)>>14;
-   	  }
-	return;
-	}
-    if(params.scale < 0.5)
-    {
         // small-scale algorithm by Ilia
         // provides much better quality on small scales
         // calculates mean value over source pixels which current destination pixel covers
@@ -1998,40 +1936,41 @@ void ImProcFunctions::resize_ (Image16* src, Image16* dst, ResizeParams params, 
         // for scales ~1 it is analogous to bilinear
         // possibly, for even less scale factors (< 0.2 possibly) boundary pixels are not needed, omitting them can give a speedup
         // this algorithm is much slower on small factors than others, because it uses all pixels of the SOURCE image
-        
+        // Ilia Popov ilia_popov@rambler.ru 2010
+	
         double delta = 1.0 / params.scale;
         double k = params.scale * params.scale;
-        
+
         for(int i = row_from; i < row_to; i++)
         {
             // top and bottom boundary coordinates
             double y0 = i * delta;
             double y1 = (i + 1) * delta;
-            
+
             int m0 = y0;
             m0 = CLIPTO(m0, 0, src->height-1);
-            
+
             int m1 = y1;
             m1 = CLIPTO(m1, 0, src->height-1);
-            
+
             // weights of boundary pixels
             double wy0 = 1.0 - (y0 - m0);
             double wy1 = y1 - m1;
-            
+
             for(int j = 0; j < dst->width; j++)
             {
                 // left and right boundary coordinates
                 double x0 = j * delta;
                 double x1 = (j + 1) * delta;
-                
+
                 int n0 = x0;
                 n0 = CLIPTO(n0, 0, src->width-1);
                 int n1 = x1;
                 n1 = CLIPTO(n1, 0, src->width-1);
-                
+
                 double wx0 = 1.0 - (x0 - n0);
                 double wx1 = x1 - n1;
-                
+
                 double r = 0;
                 double g = 0;
                 double b = 0;
@@ -2041,6 +1980,7 @@ void ImProcFunctions::resize_ (Image16* src, Image16* dst, ResizeParams params, 
                 r += wy0 * wx0 * src->r[m0][n0] + wy0 * wx1 * src->r[m0][n1] + wy1 * wx0 * src->r[m1][n0] + wy1 * wx1 * src->r[m1][n1]; 
                 g += wy0 * wx0 * src->g[m0][n0] + wy0 * wx1 * src->g[m0][n1] + wy1 * wx0 * src->g[m1][n0] + wy1 * wx1 * src->g[m1][n1]; 
                 b += wy0 * wx0 * src->b[m0][n0] + wy0 * wx1 * src->b[m0][n1] + wy1 * wx0 * src->b[m1][n0] + wy1 * wx1 * src->b[m1][n1]; 
+
                 // top and bottom boundaries
                 for(int n = n0 + 1; n < n1; n++)
                 {
@@ -2048,6 +1988,7 @@ void ImProcFunctions::resize_ (Image16* src, Image16* dst, ResizeParams params, 
                     g += wy0 * src->g[m0][n] + wy1 * src->g[m1][n];
                     b += wy0 * src->b[m0][n] + wy1 * src->b[m1][n];
                 }
+
                 // inner rows
                 for(int m = m0 + 1; m < m1; m++)
                 {
@@ -2062,9 +2003,8 @@ void ImProcFunctions::resize_ (Image16* src, Image16* dst, ResizeParams params, 
                         g += src->g[m][n];
                         b += src->b[m][n];
                     }
-                    
                 }
-                
+	        
                 // overall weight is equal to the DST pixel area in SRC coordinates
                 r *= k;
                 g *= k;
@@ -2073,6 +2013,86 @@ void ImProcFunctions::resize_ (Image16* src, Image16* dst, ResizeParams params, 
                 dst->r[i][j] = CLIP((int)r);
                 dst->g[i][j] = CLIP((int)g);
                 dst->b[i][j] = CLIP((int)b);
+            }
+        }
+        
+        return;
+    }
+    
+    if(params.method == "Downscale (Faster)")
+	{
+        // faster version of algo above, does not take into account border pixels,
+        // which are summed with non-unity weights in slow algo. So, no need
+        // for weights at all
+        // Ilia Popov ilia_popov@rambler.ru 5.04.2010
+
+        double delta = 1.0 / params.scale;
+        
+        int p = (int) delta;
+        
+        // if actually we are doing upscaling, behave like Nearest
+        if(p == 0)
+            p = 1;
+            
+        int q = p/2;
+        
+        // may cause problems on 32-bit systems on extremely small factors.
+        // In that case change 1024 to smth less
+        const int divider = 1024;
+        
+        // scaling factor after summation
+        int k = divider / (p * p); 
+
+        for(int i = row_from; i < row_to; i++)
+        {
+            // y coordinate of center of destination pixel
+            double y = (i + 0.5) * delta;
+
+            int m0 = (int) (y) - q;
+            m0 = CLIPTO(m0, 0, src->height-1);
+
+            int m1 = m0 + p;
+            if(m1 > src->height)
+            {
+                m1 = src->height;
+                m0 = m1 - p;
+            }
+            m1 = CLIPTO(m1, 0, src->height);
+
+            for(int j = 0; j < dst->width; j++)
+            {
+                // x coordinate of center of destination pixel
+                double x = (j + 0.5) * delta;
+
+                int n0 = (int) (x) - q;
+                n0 = CLIPTO(n0, 0, src->width-1);
+
+                int n1 = n0 + p;
+                if(n1 > src->width)
+                {
+                    n1 = src->width;
+                    n0 = n1 - p;
+                }
+                n1 = CLIPTO(n1, 0, src->width);
+
+                int r = 0;
+                int g = 0;
+                int b = 0;
+
+                // integration
+                for(int m = m0; m < m1; m++)
+                {
+                    for(int n = n0; n < n1; n++)
+                    {
+                        r += src->r[m][n];
+                        g += src->g[m][n];
+                        b += src->b[m][n];
+                    }
+                }
+	        
+                dst->r[i][j] = CLIP( r * k / divider);
+                dst->g[i][j] = CLIP( g * k / divider);
+                dst->b[i][j] = CLIP( b * k / divider);
             }
         }
         return;
