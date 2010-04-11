@@ -406,8 +406,9 @@ void Options::load () {
         }
         cacheBaseDir = rtdir + "/cache";
     }
-    if (!langMgr.load (argv0+"/languages/"+options.language, new MultiLangMgr (argv0+"/languages/english-us")))
-        langMgr.load (argv0+"/languages/english-us");
+
+    if (!langMgr.load (argv0+"/languages/"+options.language, new MultiLangMgr (argv0+"/languages/English (US)")))
+        langMgr.load (argv0+"/languages/English (US)");
 
     rtengine::init (&options.rtSettings);
 }
