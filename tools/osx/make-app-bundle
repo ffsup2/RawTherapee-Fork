@@ -31,15 +31,16 @@ SHARE=${MACOS}/share
 RELEASE=release
 DMG=${RELEASE}/RawTherapee.dmg
 EXECUTABLE=rt
+BUILD_FOLDER=./tools/osx
 
-#Find where MacPorts is installed.  We take a known binary (cmake), which is in <MacPorts>/bin, and 
+#Find where MacPorts is installed.  We take a known binary (port), which is in <MacPorts>/bin, and 
 # go up a level to get the main install folder.
-MACPORTS_PREFIX=`which cmake`
+MACPORTS_PREFIX=`which port`
 MACPORTS_PREFIX=`dirname $MACPORTS_PREFIX`
 MACPORTS_PREFIX=`dirname $MACPORTS_PREFIX`
 
 if [ ! -d ${RELEASE} ]; then
-	echo "Please run this from the root of the project; i.e. './tools/osx/make-app-bundle'."
+	echo "Please run this from the root of the project; i.e. ${BUILD_FOLDER}/`basename $0`."
 	exit
 fi
 
@@ -73,7 +74,7 @@ cp -R $MACPORTS_PREFIX/etc/gtk-2.0 ${ETC}
 cp -R $MACPORTS_PREFIX/etc/pango ${ETC}
 ESCAPED_MACPORTS_PREFIX=`echo ${MACPORTS_PREFIX} | sed -e 's/\\//\\\\\\//g'`
 sed -i .bak -e "s/${ESCAPED_MACPORTS_PREFIX}/@executable_path/g" ${ETC}/gtk-2.0/gdk-pixbuf.loaders ${ETC}/pango/pango.modules
-echo -e "[Pango]\nModuleFiles = /tmp/${EXECUTABLE}_pango.modules" > ${ETC}/pango/pangorc
+echo -e "[Pango]\nModuleFiles = /tmp/`basename ${EXECUTABLE}`_pango.modules" > ${ETC}/pango/pangorc
 
 
 #Copy over the release files
@@ -82,9 +83,9 @@ cp -R release/* ${MACOS}
 
 #Copy application-specific stuff like icons and startup script
 echo "Creating required application bundle files..."
-cp ./tools/osx/Info.plist ${CONTENTS}
-cp tools/osx/Icons.icns ${RESOURCES}
-cp tools/osx/start ${MACOS}
+cp ${BUILD_FOLDER}/Info.plist ${CONTENTS}
+cp ${BUILD_FOLDER}/Icons.icns ${RESOURCES}
+cp ${BUILD_FOLDER}/start ${MACOS}
 
 #Copy and relink the explicitly defined libraries
 echo "Recursively copying libraries referenced by executable..."
