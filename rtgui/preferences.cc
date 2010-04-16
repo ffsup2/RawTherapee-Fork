@@ -247,7 +247,7 @@ Gtk::Widget* Preferences::getProcParamsPanel () {
     fdp->add (*vbdp);
     mvbpp->pack_start (*fdp, Gtk::PACK_SHRINK, 4);
 
-    Gtk::Frame* fdem = Gtk::manage (new Gtk::Frame (M("PREFERENCES_DEMOSAICINGALGO")));
+    /*Gtk::Frame* fdem = Gtk::manage (new Gtk::Frame (M("PREFERENCES_DEMOSAICINGALGO")));
     Gtk::VBox* fdb = Gtk::manage (new Gtk::VBox ());
     fdb->set_border_width (4);
     fdem->add (*fdb);
@@ -286,7 +286,7 @@ Gtk::Widget* Preferences::getProcParamsPanel () {
     fdb->pack_start (*hb12, Gtk::PACK_SHRINK, 4);
     fdb->pack_start (*hb13, Gtk::PACK_SHRINK, 4);
     fdb->pack_start (*dcbEnhance, Gtk::PACK_SHRINK, 4);
-    mvbpp->pack_start (*fdem, Gtk::PACK_SHRINK, 4);
+    mvbpp->pack_start (*fdem, Gtk::PACK_SHRINK, 4);*/
     mvbpp->set_border_width (4);
     //  drlab->set_size_request (drimg->get_width(), -1);
 
@@ -299,7 +299,7 @@ Gtk::Widget* Preferences::getProcParamsPanel () {
         iprofiles->append_text (pnames[i]);
     }
 
-    dmconn = dmethod->signal_changed().connect( sigc::mem_fun(*this, &Preferences::dmethodChanged) );
+    //dmconn = dmethod->signal_changed().connect( sigc::mem_fun(*this, &Preferences::dmethodChanged) );
 
     return mvbpp;
 }
@@ -693,7 +693,7 @@ void Preferences::storePreferences () {
         moptions.editorToSendTo = 3;
 
 
-    moptions.rtSettings.colorCorrectionSteps= (int)ccSteps->get_value ();
+    /*moptions.rtSettings.colorCorrectionSteps= (int)ccSteps->get_value ();
     moptions.rtSettings.monitorProfile      = monProfile->get_filename ();
 	moptions.rtSettings.iccDirectory        = iccDir->get_filename ();
 	moptions.rtSettings.colorimetricIntent  = intent->get_active_row_number ();
@@ -710,7 +710,7 @@ void Preferences::storePreferences () {
     else if (dmethod->get_active_row_number()==5)
         moptions.rtSettings.demosaicMethod = "ahd";
     moptions.rtSettings.dcb_iterations=(int)dcbIterations->get_value();
-    moptions.rtSettings.dcb_enhance=dcbEnhance->get_active();
+    moptions.rtSettings.dcb_enhance=dcbEnhance->get_active();*/
 
     if (sdcurrent->get_active ()) 
         moptions.startupDir = STARTUPDIR_CURRENT;
@@ -755,13 +755,13 @@ void Preferences::storePreferences () {
 
 void Preferences::fillPreferences () {
 
-    dmconn.block (true);
+    //dmconn.block (true);
     tconn.block (true);
 
     rprofiles->set_active_text (moptions.defProfRaw);
     iprofiles->set_active_text (moptions.defProfImg);
     dateformat->set_text (moptions.dateFormat);
-    ccSteps->set_value (moptions.rtSettings.colorCorrectionSteps);
+    //ccSteps->set_value (moptions.rtSettings.colorCorrectionSteps);
     if (Glib::file_test (moptions.rtSettings.monitorProfile, Glib::FILE_TEST_EXISTS)) 
         monProfile->set_filename (moptions.rtSettings.monitorProfile);
     if (Glib::file_test (moptions.rtSettings.iccDirectory, Glib::FILE_TEST_IS_DIR)) 
@@ -790,7 +790,7 @@ void Preferences::fillPreferences () {
 #endif	
     editorToSendTo->set_text (moptions.customEditorProg);
 
-    if (moptions.rtSettings.demosaicMethod=="eahd")
+    /*if (moptions.rtSettings.demosaicMethod=="eahd")
         dmethod->set_active (0);
     else if (moptions.rtSettings.demosaicMethod=="hphd")
         dmethod->set_active (1);
@@ -806,7 +806,7 @@ void Preferences::fillPreferences () {
     dcbIterations->set_value(moptions.rtSettings.dcb_iterations);
     dcbEnhance->set_sensitive(moptions.rtSettings.demosaicMethod=="dcb");
     dcbIterations->set_sensitive(moptions.rtSettings.demosaicMethod=="dcb");
-    dcbIterationsLabel->set_sensitive(moptions.rtSettings.demosaicMethod=="dcb");
+    dcbIterationsLabel->set_sensitive(moptions.rtSettings.demosaicMethod=="dcb");*/
 
     if (moptions.startupDir==STARTUPDIR_CURRENT) 
         sdcurrent->set_active ();
@@ -853,7 +853,7 @@ void Preferences::fillPreferences () {
     addc.block (false);
     setc.block (false);
     
-    dmconn.block (false);
+    //dmconn.block (false);
     tconn.block (false);
 }
 

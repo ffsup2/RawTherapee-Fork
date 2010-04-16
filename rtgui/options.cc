@@ -114,10 +114,6 @@ void Options::setDefaults () {
     baBehav = std::vector<int> (babehav, babehav+22);
     
     rtSettings.dualThreadEnabled = true;
-    rtSettings.demosaicMethod = "eahd";
-    rtSettings.colorCorrectionSteps = 2;
-    rtSettings.dcb_iterations = 2;
-    rtSettings.dcb_enhance = true;
     rtSettings.iccDirectory = "/usr/share/color/icc";
     rtSettings.colorimetricIntent = 1;
     rtSettings.monitorProfile = "";
@@ -243,12 +239,12 @@ if (keyFile.has_group ("GUI")) {
     if (keyFile.has_key ("GUI", "CurvePanelsExpanded")) crvOpen           = keyFile.get_integer_list ("GUI", "CurvePanelsExpanded");
 }
 
-if (keyFile.has_group ("Algorithms")) { 
+/*if (keyFile.has_group ("Algorithms")) {
     if (keyFile.has_key ("Algorithms", "DemosaicMethod"))  rtSettings.demosaicMethod       = keyFile.get_string  ("Algorithms", "DemosaicMethod");
     if (keyFile.has_key ("Algorithms", "ColorCorrection")) rtSettings.colorCorrectionSteps = keyFile.get_integer ("Algorithms", "ColorCorrection");
     if(keyFile.has_key("Algorithms", "DCBIterations")) rtSettings.dcb_iterations = keyFile.get_integer("Algorithms", "DCBIterations");
     if(keyFile.has_key("Algorithms", "DCBEnhance")) rtSettings.dcb_enhance = keyFile.get_boolean("Algorithms", "DCBEnhance");
-}
+}*/
 
 if (keyFile.has_group ("Crop Settings")) { 
     if (keyFile.has_key ("Crop Settings", "DPI"))       cropDPI      = keyFile.get_integer ("Crop Settings", "DPI");
@@ -368,10 +364,10 @@ int Options::saveToFile (Glib::ustring fname) {
     Glib::ArrayHandle<int> crvopen = crvOpen;
     keyFile.set_integer_list ("GUI", "CurvePanelsExpanded", crvopen);
 
-    keyFile.set_string  ("Algorithms", "DemosaicMethod", rtSettings.demosaicMethod);
+/*    keyFile.set_string  ("Algorithms", "DemosaicMethod", rtSettings.demosaicMethod);
     keyFile.set_integer ("Algorithms", "ColorCorrection", rtSettings.colorCorrectionSteps);
     keyFile.set_integer ("Algorithms", "DCBIterations", rtSettings.dcb_iterations);
-    keyFile.set_boolean ("Algorithms", "DCBEnhance", rtSettings.dcb_enhance);
+    keyFile.set_boolean ("Algorithms", "DCBEnhance", rtSettings.dcb_enhance);*/
     
     keyFile.set_integer ("Crop Settings", "DPI", cropDPI);
 

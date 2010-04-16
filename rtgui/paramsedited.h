@@ -172,6 +172,15 @@ class CACorrParamsEdited {
         bool blue;
 };
 
+class RAWParamsEdited {
+
+    public:
+        bool ccSteps;
+        bool dmethod;
+        bool dcbIterations;
+        bool dcbEnhance;
+};
+
 class HRecParamsEdited {
 
     public:
@@ -229,7 +238,8 @@ class ParamsEdited {
         CoarseTransformParamsEdited   coarse;         
         RotateParamsEdited            rotate;         
         DistortionParamsEdited        distortion;     
-        CACorrParamsEdited            cacorrection;   
+        CACorrParamsEdited            cacorrection;
+        RAWParamsEdited               rawdemosaic;
         VignettingParamsEdited        vignetting;     
         ChannelMixerParamsEdited      chmixer;        
         HRecParamsEdited              hlrecovery;     

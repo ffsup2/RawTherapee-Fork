@@ -21,7 +21,7 @@
 
 #include <glibmm.h>
 
-#define NUMOFEVENTS 83
+//#define NUMOFEVENTS 84
 
 #define FIRST          65535
 #define ALL            65535
@@ -33,6 +33,7 @@
 #define SHARPENING     2
 #define LUMADENOISE    2
 #define WHITEBALANCE   255
+#define DEMOSAIC       511
 #define COLORBOOST     1
 #define COLORDENOISE   1
 #define CROP           16384
@@ -40,6 +41,7 @@
 #define IPTC           32768
 #define NONE           0
 
+#define M_RAW       256
 #define M_INIT      128
 #define M_TRANSFORM 64
 #define M_BLURMAP   32

@@ -185,6 +185,8 @@ HISTORY_MSG_79;Resize width
 HISTORY_MSG_7;Black
 HISTORY_MSG_80;Resize height
 HISTORY_MSG_81;Resize enabled
+HISTORY_MSG_84;Demosaic
+HISTORY_MSG_85;False colors
 HISTORY_MSG_8;Exposure Compensation
 HISTORY_MSG_9;Highlight Compression
 HISTORY_NEWSNAPSHOT;Add

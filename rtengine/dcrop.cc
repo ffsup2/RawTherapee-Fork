@@ -89,7 +89,7 @@ void Crop::update (int todo, bool internal) {
     // it something has been reallocated, all processing steps have to be performed
     if (needsinitupdate)
         todo = ALL;
-        
+
     if (resizeCrop)
         baseCrop = resizeCrop;
     else
@@ -108,7 +108,7 @@ void Crop::update (int todo, bool internal) {
         if (!needsinitupdate)
             setCropSizes (rqcropx, rqcropy, rqcropw, rqcroph, skip, true);
         PreviewProps pp (trafx, trafy, trafw*skip, trafh*skip, skip);
-        parent->imgsrc->getImage (parent->currWB, tr, origCrop, pp, params.hlrecovery, params.icm);
+        parent->imgsrc->getImage (parent->currWB, tr, origCrop, pp, params.hlrecovery, params.icm, params.rawdemosaic );
 
         if (fabs(params.resize.scale-1.0)<1e-7) {
             if (resizeCrop) {

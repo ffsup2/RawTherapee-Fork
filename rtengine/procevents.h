@@ -19,10 +19,6 @@
 #ifndef __PROCEVENT__
 #define __PROCEVENT__
 
-#include <rtengine.h>
-
-#define NUMOFEVENTS 83
-
 namespace rtengine {
 
 enum ProcEvent {
@@ -108,7 +104,10 @@ enum ProcEvent {
     EvResizeHeight=79,
     EvResizeEnabled=80,
     EvProfileChangeNotification=81,
-    EvSHHighQuality=82
+    EvSHHighQuality=82,
+    EvDemosaic=83,
+    EvCcSteps=84,
+    NUMOFEVENTS=85
 	};
 }    
 #endif    

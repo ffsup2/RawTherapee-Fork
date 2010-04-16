@@ -79,6 +79,10 @@ void ImProcCoordinator::updatePreviewImage (int todo) {
     else if (params.resize.dataspec==2)
         params.resize.scale = (double)params.resize.height / (params.coarse.rotate==90 || params.coarse.rotate==270 ? fw : fh);
 
+    if( todo & M_RAW ){
+        progress ("Demosaicing...",100*readyphase/numofphases);
+    	imgsrc->demosaic( params.rawdemosaic );
+    }
     progress ("Applying white balance, color correction & sRBG conversion...",100*readyphase/numofphases);
     if (todo & M_INIT) {
         minit.lock ();
@@ -106,7 +110,7 @@ void ImProcCoordinator::updatePreviewImage (int todo) {
         imgsrc->getFullSize (fw, fh, tr);
         PreviewProps pp (0, 0, fw, fh, scale);
         setScale (scale, true);
-        imgsrc->getImage (currWB, tr, orig_prev, pp, params.hlrecovery, params.icm);
+        imgsrc->getImage (currWB, tr, orig_prev, pp, params.hlrecovery, params.icm, params.rawdemosaic);
         ipf.firstAnalysis (orig_prev, &params, vhist16, imgsrc->getGamma());
         minit.unlock ();
     }
@@ -374,10 +378,10 @@ void ImProcCoordinator::updateHistograms (int x1, int y1, int x2, int y2) {
 
 void ImProcCoordinator::progress (Glib::ustring str, int pr) {
 
-/*  if (plistener) {
+  if (plistener) {
     plistener->setProgressStr (str);
     plistener->setProgress ((double)pr / 100.0);
-  }*/
+  }
 }
 
 void ImProcCoordinator::getAutoWB (double& temp, double& green) {
@@ -506,7 +510,7 @@ void ImProcCoordinator::saveInputICCReference (const Glib::ustring& fname) {
     ppar.hlrecovery.enabled = false;
     ppar.icm.input = "(none)";
     Image16* im = new Image16 (fW, fH);
-    imgsrc->getImage (imgsrc->getWB(), 0, im, pp, ppar.hlrecovery, ppar.icm);
+    imgsrc->getImage (imgsrc->getWB(), 0, im, pp, ppar.hlrecovery, ppar.icm, ppar.rawdemosaic);
     im->saveJPEG (fname, 85);
     mProcessing.unlock ();
 }

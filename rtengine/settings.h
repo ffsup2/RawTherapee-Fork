@@ -25,14 +25,10 @@ namespace rtengine {
     class Settings {
         public:
             bool            dualThreadEnabled;      ///< If true, the image processing operations with utilize two processor cores (if possible)
-            std::string     demosaicMethod;         ///< The algorithm used for demosaicing. Can be "eahd", "hphd" or "vng4".
-            int             colorCorrectionSteps;   ///< The number of color correction steps applied right after the demosaicing
             Glib::ustring   iccDirectory;           ///< The directory containing the possible output icc profiles
             int             colorimetricIntent;     ///< Colorimetric intent used at color space conversions
             Glib::ustring   monitorProfile;         ///< ICC profile of the monitor (full path recommended)
             bool            verbose;
-	    int dcb_iterations;	// number of dcb iterations
-	    bool dcb_enhance;	// whether to do image refinment
 
         /** Creates a new instance of Settings.
           * @return a pointer to the new Settings instance. */

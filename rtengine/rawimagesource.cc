@@ -170,8 +170,8 @@ void RawImageSource::transformRect (PreviewProps pp, int tran, int &ssx1, int &s
     }      
 }
 
-void RawImageSource::getImage (ColorTemp ctemp, int tran, Image16* image, PreviewProps pp, HRecParams hrp, ColorManagementParams cmp) {
-
+void RawImageSource::getImage (ColorTemp ctemp, int tran, Image16* image, PreviewProps pp, HRecParams hrp, ColorManagementParams cmp, RAWParams raw)
+{
     isrcMutex.lock ();
 
     tran = defTransform (tran);
@@ -315,7 +315,7 @@ void RawImageSource::getImage (ColorTemp ctemp, int tran, Image16* image, Previe
         
     // Color correction
     if (ri->filters && pp.skip==1)
-        correction_YIQ_LQ (image, settings->colorCorrectionSteps);
+        correction_YIQ_LQ (image, raw.ccSteps );
  
     // Applying postmul
     colorSpaceConversion (image, cmp, embProfile, camProfile, cam, defGain);
@@ -720,77 +720,82 @@ int RawImageSource::load (Glib::ustring fname) {
     rml.ciffLength = ri->ciff_len;
 
     idata = new ImageData (fname, &rml); 
-
-    // check if it is an olympus E camera, if yes, compute G channel pre-compensation factors
-    if (((idata->getMake().size()>=7 && idata->getMake().substr(0,7)=="OLYMPUS" && idata->getModel()[0]=='E') || (idata->getMake().size()>=9 && idata->getMake().substr(0,7)=="Panasonic")) && settings->demosaicMethod!="vng4" && ri->filters) {
-        // global correction
-        int ng1=0, ng2=0;
-        double avgg1=0, avgg2=0;
-        for (int i=border; i<H-border; i++)
-            for (int j=border; j<W-border; j++)
-                if (ISGREEN(ri,i,j)) {
-                    if (i%2==0) {
-                        avgg1 += ri->data[i][j];
-                        ng1++;
-                    }
-                    else {
-                        avgg2 += ri->data[i][j];
-                        ng2++;
-                    }
-                }
-        double corrg1 = ((double)avgg1/ng1 + (double)avgg2/ng2) / 2.0 / ((double)avgg1/ng1);
-        double corrg2 = ((double)avgg1/ng1 + (double)avgg2/ng2) / 2.0 / ((double)avgg2/ng2);
-        for (int i=border; i<H-border; i++)
-            for (int j=border; j<W-border; j++)
-                if (ISGREEN(ri,i,j)) 
-                        ri->data[i][j] = CLIP(ri->data[i][j] * (i%2 ? corrg2 : corrg1));
-
-        // local correction in a 9x9 box
-/*        unsigned short* corr_alloc = new unsigned short[W*H];
-        unsigned short** corr_data = new unsigned short* [H];
-        for (int i=0; i<H; i++) 
-            corr_data[i] = corr_alloc + i*W;
-        memcpy (corr_alloc, ri->allocation, W*H*sizeof(unsigned short));
-        for (int i=border; i<H-border; i++)
-            for (int j=border; j<W-border; j++)
-                if (ISGREEN(ri,i,j)) {
-                    unsigned int ag1 = ri->data[i-4][j-4] + ri->data[i-4][j-2] + ri->data[i-4][j] + ri->data[i-4][j+2] +
-                              ri->data[i-2][j-4] + ri->data[i-2][j-2] + ri->data[i-2][j] + ri->data[i-2][j+2] +
-                              ri->data[i][j-4] + ri->data[i][j-2] + ri->data[i][j] + ri->data[i][j+2] +
-                              ri->data[i+2][j-4] + ri->data[i+2][j-2] + ri->data[i+2][j] + ri->data[i+2][j+2];
-                    unsigned int ag2 = ri->data[i-3][j-3] + ri->data[i-3][j-1] + ri->data[i-3][j+1] + ri->data[i-3][j+1] +
-                              ri->data[i-1][j-3] + ri->data[i-1][j-1] + ri->data[i-1][j+1] + ri->data[i-1][j+1] +
-                              ri->data[i+1][j-3] + ri->data[i+1][j-1] + ri->data[i+1][j+1] + ri->data[i+1][j+1] +
-                              ri->data[i+3][j-3] + ri->data[i+3][j-1] + ri->data[i+3][j+1] + ri->data[i+3][j+1];
-                    unsigned int val = (ri->data[i][j] + ri->data[i][j] * ag2 / ag1) / 2;
-                    corr_data[i][j] = CLIP (val);
-                }
-        memcpy (ri->allocation, corr_alloc, W*H*sizeof(unsigned short));
-        delete corr_alloc;
-        delete corr_data;
-*/                        
-    }
-    
-    if (ri->filters) {
-        // demosaic
-        if (settings->demosaicMethod=="hphd")
-            hphd_demosaic ();
-        else if (settings->demosaicMethod=="vng4")
-            vng4_demosaic ();
-        else if (settings->demosaicMethod=="ahd")
-            ahd_demosaic ();
-        else if (settings->demosaicMethod=="ppg")
-            ppg_demosaic ();
-        else if (settings->demosaicMethod=="dcb")
-            dcb_demosaic(settings->dcb_iterations, settings->dcb_enhance? 1:0);
-        else
-            eahd_demosaic ();
-    }
-
-
     if (plistener) {
         plistener->setProgressStr ("Ready.");
         plistener->setProgress (1.0);
+    }
+
+    return 0;
+}
+
+void RawImageSource::GreenCompensation()
+{
+	// global correction
+	int ng1=0, ng2=0;
+	double avgg1=0, avgg2=0;
+	for (int i=border; i<H-border; i++)
+		for (int j=border; j<W-border; j++)
+			if (ISGREEN(ri,i,j)) {
+				if (i%2==0) {
+					avgg1 += ri->data[i][j];
+					ng1++;
+				}
+				else {
+					avgg2 += ri->data[i][j];
+					ng2++;
+				}
+			}
+	double corrg1 = ((double)avgg1/ng1 + (double)avgg2/ng2) / 2.0 / ((double)avgg1/ng1);
+	double corrg2 = ((double)avgg1/ng1 + (double)avgg2/ng2) / 2.0 / ((double)avgg2/ng2);
+	for (int i=border; i<H-border; i++)
+		for (int j=border; j<W-border; j++)
+			if (ISGREEN(ri,i,j))
+					ri->data[i][j] = CLIP(ri->data[i][j] * (i%2 ? corrg2 : corrg1));
+
+	// local correction in a 9x9 box
+/*        unsigned short* corr_alloc = new unsigned short[W*H];
+	unsigned short** corr_data = new unsigned short* [H];
+	for (int i=0; i<H; i++)
+		corr_data[i] = corr_alloc + i*W;
+	memcpy (corr_alloc, ri->allocation, W*H*sizeof(unsigned short));
+	for (int i=border; i<H-border; i++)
+		for (int j=border; j<W-border; j++)
+			if (ISGREEN(ri,i,j)) {
+				unsigned int ag1 = ri->data[i-4][j-4] + ri->data[i-4][j-2] + ri->data[i-4][j] + ri->data[i-4][j+2] +
+						  ri->data[i-2][j-4] + ri->data[i-2][j-2] + ri->data[i-2][j] + ri->data[i-2][j+2] +
+						  ri->data[i][j-4] + ri->data[i][j-2] + ri->data[i][j] + ri->data[i][j+2] +
+						  ri->data[i+2][j-4] + ri->data[i+2][j-2] + ri->data[i+2][j] + ri->data[i+2][j+2];
+				unsigned int ag2 = ri->data[i-3][j-3] + ri->data[i-3][j-1] + ri->data[i-3][j+1] + ri->data[i-3][j+1] +
+						  ri->data[i-1][j-3] + ri->data[i-1][j-1] + ri->data[i-1][j+1] + ri->data[i-1][j+1] +
+						  ri->data[i+1][j-3] + ri->data[i+1][j-1] + ri->data[i+1][j+1] + ri->data[i+1][j+1] +
+						  ri->data[i+3][j-3] + ri->data[i+3][j-1] + ri->data[i+3][j+1] + ri->data[i+3][j+1];
+				unsigned int val = (ri->data[i][j] + ri->data[i][j] * ag2 / ag1) / 2;
+				corr_data[i][j] = CLIP (val);
+			}
+	memcpy (ri->allocation, corr_alloc, W*H*sizeof(unsigned short));
+	delete corr_alloc;
+	delete corr_data;	 */
+}
+
+int RawImageSource::demosaic(RAWParams raw)
+{
+    if (ri->filters) {
+	    // check if it is an olympus E camera, if yes, compute G channel pre-compensation factors
+		if (((idata->getMake().size()>=7 && idata->getMake().substr(0,7)=="OLYMPUS" && idata->getModel()[0]=='E') || (idata->getMake().size()>=9 && idata->getMake().substr(0,7)=="Panasonic")) && raw.dmethod != "vng4" )
+			GreenCompensation();
+
+        if (raw.dmethod =="hphd")
+            hphd_demosaic ();
+        else if (raw.dmethod=="vng4")
+            vng4_demosaic ();
+        else if (raw.dmethod=="ahd")
+            ahd_demosaic ();
+        else if (raw.dmethod=="ppg")
+            ppg_demosaic ();
+        else if (raw.dmethod=="dcb")
+            dcb_demosaic(raw.dcb_iterations, raw.dcb_enhance? 1:0);
+        else
+            eahd_demosaic ();
     }
 
     return 0;
@@ -1371,11 +1376,6 @@ void RawImageSource::colorSpaceConversion (Image16* im, ColorManagementParams cm
 
 void RawImageSource::eahd_demosaic () {
 
-  if (plistener) {
-    plistener->setProgressStr ("Demosaicing...");
-    plistener->setProgress (0.0);
-  }
-
   // prepare chache and constants for cielab conversion
   lc00 = (0.412453 * coeff[0][0] + 0.357580 * coeff[1][0] + 0.180423 * coeff[2][0]) / 0.950456;
   lc01 = (0.412453 * coeff[0][1] + 0.357580 * coeff[1][1] + 0.180423 * coeff[2][1]) / 0.950456;
@@ -1590,9 +1590,6 @@ void RawImageSource::eahd_demosaic () {
           green[i-1][j] = (gh[(i-1)%4][j] + gv[(i-1)%4][j]) / 2;
       }
     }
-
-    if (!(i%20) && plistener) 
-      plistener->setProgress ((double)i / (H-2));
   }
   // finish H-2th and H-1th row, homogenity value is still valailable
   int hc, vc;
@@ -1797,11 +1794,6 @@ void RawImageSource::hphd_green (int row_from, int row_to) {
 
 void RawImageSource::hphd_demosaic () {
 
-  if (plistener) {
-    plistener->setProgressStr ("Demosaicing...");
-    plistener->setProgress (0.0);
-  }
-
   float** hpmap = new float*[H];
   for (int i=0; i<H; i++) {
     hpmap[i] = new float[W];
@@ -1821,8 +1813,8 @@ void RawImageSource::hphd_demosaic () {
   else
       hphd_vertical (hpmap, 0, W);
 
-  if (plistener) 
-    plistener->setProgress (0.33);
+//  if (plistener) 
+//    plistener->setProgress (0.33);
 
   // horizontal
   this->hpmap = allocArray<char>(W, H);
@@ -1840,8 +1832,8 @@ void RawImageSource::hphd_demosaic () {
 
   freeArray<float>(hpmap, H);
 
-  if (plistener) 
-    plistener->setProgress (0.66);
+//  if (plistener) 
+//    plistener->setProgress (0.66);
  
 // reconstruct G
   green = new unsigned short*[H];
@@ -1857,8 +1849,8 @@ void RawImageSource::hphd_demosaic () {
   else
       hphd_green (3, H-3);
 
-  if (plistener) 
-    plistener->setProgress (1.0);
+//  if (plistener) 
+//    plistener->setProgress (1.0);
 }
 
 void RawImageSource::HLRecovery_Luminance (unsigned short* rin, unsigned short* gin, unsigned short* bin, unsigned short* rout, unsigned short* gout, unsigned short* bout, int width, int maxval) {
@@ -2251,11 +2243,6 @@ void RawImageSource::vng4_demosaic () {
     +1,+0,+2,+1,0,0x10
   }, chood[] = { -1,-1, -1,0, -1,+1, 0,+1, +1,+1, +1,0, +1,-1, 0,-1 };
 
-  if (plistener) {
-    plistener->setProgressStr ("Demosaicing...");
-    plistener->setProgress (0.0);
-  }
-
   ushort (*brow[5])[4], *pix;
   int prow=7, pcol=1, *ip, *code[16][16], gval[8], gmin, gmax, sum[4];
   int row, col, x, y, x1, x2, y1, y2, t, weight, grads, color, diag;
@@ -2386,8 +2373,8 @@ void RawImageSource::vng4_demosaic () {
       memcpy (image[(row-2)*width+2], brow[0]+2, (width-4)*sizeof *image);
     for (g=0; g < 4; g++)
       brow[(g-1) & 3] = brow[g];
-    if (!(row%20) && plistener) 
-      plistener->setProgress ((double)row / (H-2));
+    //if (!(row%20) && plistener)
+    //  plistener->setProgress ((double)row / (H-2));
   }
   memcpy (image[(row-2)*width+2], brow[0]+2, (width-4)*sizeof *image);
   memcpy (image[(row-1)*width+2], brow[1]+2, (width-4)*sizeof *image);
@@ -2428,10 +2415,10 @@ void RawImageSource::ppg_demosaic()
   ushort (*image)[4];
   int colors = 3;
 
-  if (plistener) {
+  /*if (plistener) {
     plistener->setProgressStr ("Demosaicing...");
     plistener->setProgress (0.0);
-  }
+  }*/
   
   image = (ushort (*)[4]) calloc (H*W, sizeof *image);
   for (int ii=0; ii<H; ii++)
@@ -2456,7 +2443,7 @@ void RawImageSource::ppg_demosaic()
       d = dir[i = diff[0] > diff[1]];
       pix[0][1] = ULIM(guess[i] >> 2, pix[d][1], pix[-d][1]);
     }
-    if(plistener) plistener->setProgress(0.33*row/(height-3));
+    //if(plistener) plistener->setProgress(0.33*row/(height-3));
   }
 /*  Calculate red and blue for each green pixel:		*/
   for (row=1; row < height-1; row++) {
@@ -2466,7 +2453,7 @@ void RawImageSource::ppg_demosaic()
 	pix[0][c] = CLIP((pix[-d][c] + pix[d][c] + 2*pix[0][1]
 			- pix[-d][1] - pix[d][1]) >> 1);
     }
-    if(plistener) plistener->setProgress(0.33 + 0.33*row/(height-1));
+    //if(plistener) plistener->setProgress(0.33 + 0.33*row/(height-1));
   }
 /*  Calculate blue for red pixels and vice versa:		*/
   for (row=1; row < height-1; row++) {
@@ -2484,7 +2471,7 @@ void RawImageSource::ppg_demosaic()
       else
 	pix[0][c] = CLIP((guess[0]+guess[1]) >> 2);
     }
-    if(plistener) plistener->setProgress(0.67 + 0.33*row/(height-1));
+    //if(plistener) plistener->setProgress(0.67 + 0.33*row/(height-1));
   }
 
   red = new unsigned short*[H];
@@ -2562,10 +2549,10 @@ void RawImageSource::ahd_demosaic()
     { 0.019334, 0.119193, 0.950227 } };
   const float d65_white[3] = { 0.950456, 1, 1.088754 };
 
-  if (plistener) {
+  /*if (plistener) {
     plistener->setProgressStr ("Demosaicing...");
     plistener->setProgress (0.0);
-  }
+  }*/
   
   image = (ushort (*)[4]) calloc (H*W, sizeof *image);
   for (int ii=0; ii<H; ii++)
@@ -2605,7 +2592,7 @@ void RawImageSource::ahd_demosaic()
 	}
       }
 
-    if(plistener) plistener->setProgress (0.33);
+    //if(plistener) plistener->setProgress (0.33);
 /*  Interpolate red and blue, and convert to CIELab:		*/
       for (d=0; d < 2; d++)
 	for (row=top+1; row < top+TS-1 && row < height-3; row++)
@@ -2642,7 +2629,7 @@ void RawImageSource::ahd_demosaic()
 	    lix[0][2] = 64 * 200 * (xyz[1] - xyz[2]);
 	  }
 
-      if(plistener) plistener->setProgress (0.5);
+      //if(plistener) plistener->setProgress (0.5);
 /*  Build homogeneity maps from the CIELab images:		*/
       memset (homo, 0, 2*TS*TS);
       for (row=top+2; row < top+TS-2 && row < height-4; row++) {
@@ -2667,7 +2654,7 @@ void RawImageSource::ahd_demosaic()
 		homo[d][tr][tc]++;
 	}
       }
-      if(plistener) plistener->setProgress (0.8);
+      //if(plistener) plistener->setProgress (0.8);
 /*  Combine the most homogenous pixels for the final result:	*/
       for (row=top+3; row < top+TS-3 && row < height-5; row++) {
 	tr = row-top;
@@ -2685,7 +2672,7 @@ void RawImageSource::ahd_demosaic()
 	}
       }
     }
-  if(plistener) plistener->setProgress (1.0);
+  //if(plistener) plistener->setProgress (1.0);
   free (buffer);
   red = new unsigned short*[H];
   for (int i=0; i<H; i++) {
@@ -3033,10 +3020,10 @@ void RawImageSource::dcb_demosaic(int iterations, int dcb_enhance)
 
         ushort (*image)[4];
 
-        if(plistener) {
+        /*if(plistener) {
                 plistener->setProgressStr ("Demosaicing...");
                 plistener->setProgress (0.0);
-        }
+        }*/
 
         image = (ushort (*)[4]) calloc (H*W, sizeof *image);
         for (int ii=0; ii<H; ii++)
@@ -3056,10 +3043,10 @@ void RawImageSource::dcb_demosaic(int iterations, int dcb_enhance)
 		hid2(image);
 		dcb_map(image);
 		dcb_correction(image);
-		if(plistener) plistener->setProgress (0.33*i/iterations);
+		//if(plistener) plistener->setProgress (0.33*i/iterations);
 		i++;
         }
-        if(plistener) plistener->setProgress (0.33);
+        //if(plistener) plistener->setProgress (0.33);
 
         dcb_color(image);
         dcb_pp(image);	
@@ -3068,7 +3055,7 @@ void RawImageSource::dcb_demosaic(int iterations, int dcb_enhance)
         hid2(image);
 
         //if (verbose) fprintf (stderr,_("finishing DCB...\n"));
-        if(plistener) plistener->setProgress (0.5);
+        //if(plistener) plistener->setProgress (0.5);
 
         dcb_map(image);
         dcb_correction2(image);
@@ -3089,14 +3076,14 @@ void RawImageSource::dcb_demosaic(int iterations, int dcb_enhance)
         restore_from_buffer(image, image2);
         dcb_color(image);
 
-        if(plistener) plistener->setProgress (0.7);
+        //if(plistener) plistener->setProgress (0.7);
         if (dcb_enhance) {
 		//if (verbose) fprintf (stderr,_("optional DCB refinement...\n"));			
 		dcb_refinement(image);
 		dcb_color_full(image);
         }
 
-        if(plistener) plistener->setProgress (1.0);
+        //if(plistener) plistener->setProgress (1.0);
 
         free(image2);
 

@@ -44,6 +44,7 @@
 #include <hlrec.h>
 #include <colorshift.h>
 #include <cacorrection.h>
+#include <RawDemosaicing.h>
 #include <distortion.h>
 #include <rotate.h>
 #include <vignetting.h>
@@ -72,6 +73,7 @@ class ToolPanelCoordinator :    public ToolPanelListener,
         ChMixer* chmixer;
         ColorBoost* colorboost;
         Resize* resize;
+        RawDemosaicing *demosaic;
         ICMPanel* icm;
         Crop* crop;
         ToneCurve* curve;
