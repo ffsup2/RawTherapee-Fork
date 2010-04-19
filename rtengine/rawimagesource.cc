@@ -784,15 +784,15 @@ int RawImageSource::demosaic(RAWParams raw)
 		if (((idata->getMake().size()>=7 && idata->getMake().substr(0,7)=="OLYMPUS" && idata->getModel()[0]=='E') || (idata->getMake().size()>=9 && idata->getMake().substr(0,7)=="Panasonic")) && raw.dmethod != "vng4" )
 			GreenCompensation();
 
-        if (raw.dmethod =="hphd")
+        if (raw.dmethod == RAWParams::methodstring[RAWParams::hphd])
             hphd_demosaic ();
-        else if (raw.dmethod=="vng4")
+        else if (raw.dmethod == RAWParams::methodstring[RAWParams::vng4])
             vng4_demosaic ();
-        else if (raw.dmethod=="ahd")
+        else if (raw.dmethod == RAWParams::methodstring[RAWParams::ahd])
             ahd_demosaic ();
-        else if (raw.dmethod=="ppg")
+        else if (raw.dmethod== RAWParams::methodstring[RAWParams::ppg])
             ppg_demosaic ();
-        else if (raw.dmethod=="dcb")
+        else if (raw.dmethod== RAWParams::methodstring[RAWParams::dcb])
             dcb_demosaic(raw.dcb_iterations, raw.dcb_enhance? 1:0);
         else
             eahd_demosaic ();

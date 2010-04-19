@@ -230,6 +230,17 @@ class CACorrParams {
 class RAWParams {
 
     public:
+		enum eMethod{
+			eahd,
+			hphd,
+			vng4,
+			dcb,
+			ppg,
+			ahd,
+			numMethods // This MUST be the last enum
+		};
+		static const char *methodstring[numMethods];
+
         int ccSteps;
         Glib::ustring dmethod;
         int dcb_iterations;

@@ -20,7 +20,6 @@
 #define _RAWDEMOSAICING_H_
 
 #include <gtkmm.h>
-//#include <cropguilistener.h>
 #include <toolpanel.h>
 
 
